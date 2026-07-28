@@ -1,0 +1,538 @@
+/* Google Font */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+.superadmin-container{
+    display:flex;
+    min-height:100vh;
+    background:#F1F5F9;
+    font-family:"Poppins",sans-serif;
+}
+
+/*==============================
+SIDEBAR
+===============================*/
+
+.sidebar{
+    width:300px;
+    height:100vh;
+    position:sticky;
+    top:0;
+
+    overflow-y:auto;
+    overflow-x:hidden;
+
+    background:#FFFFFF;
+
+    border-right:1px solid #E2E8F0;
+    box-shadow:8px 0 30px rgba(15,23,42,.08);
+
+    padding:28px 22px;
+    box-sizing:border-box;
+
+    z-index:100;
+}
+
+/* Animated Background */
+
+.sidebar::before{
+    content:"";
+    position:absolute;
+    top:-100px;
+    left:-100px;
+    width:220px;
+    height:220px;
+    background:#2563EB;
+    opacity:.12;
+    border-radius:50%;
+    filter:blur(90px);
+    animation:moveOne 8s ease-in-out infinite alternate;
+    z-index:-1;
+}
+
+.sidebar::after{
+    content:"";
+    position:absolute;
+    bottom:-80px;
+    right:-80px;
+    width:180px;
+    height:180px;
+    background:#10B981;
+    opacity:.10;
+    border-radius:50%;
+    filter:blur(80px);
+    animation:moveTwo 10s ease-in-out infinite alternate;
+    z-index:-1;
+}
+
+/* Scrollbar */
+
+.sidebar::-webkit-scrollbar{
+    width:8px;
+}
+
+.sidebar::-webkit-scrollbar-track{
+    background:#F1F5F9;
+    border-radius:20px;
+}
+
+.sidebar::-webkit-scrollbar-thumb{
+    background:linear-gradient(
+        180deg,
+        #2563EB,
+        #3B82F6,
+        #10B981
+    );
+    border-radius:20px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover{
+    background:linear-gradient(
+        180deg,
+        #1D4ED8,
+        #2563EB,
+        #059669
+    );
+}
+
+@keyframes moveOne{
+    from{
+        transform:translate(0,0);
+    }
+    to{
+        transform:translate(60px,80px);
+    }
+}
+
+@keyframes moveTwo{
+    from{
+        transform:translate(0,0);
+    }
+    to{
+        transform:translate(-70px,-50px);
+    }
+}
+/* ================= Menu ================= */
+
+.menu{
+    list-style:none;
+    padding:0;
+    margin-top:25px;
+}
+
+.menu-item{
+
+    display:flex;
+    align-items:center;
+    gap:15px;
+
+    padding:15px 18px;
+
+    margin-bottom:12px;
+
+    border-radius:14px;
+
+    color:#334155;
+
+    cursor:pointer;
+
+    transition:.35s;
+
+    font-weight:600;
+
+    border-left:4px solid transparent;
+
+}
+
+.menu-item:hover{
+
+    background:#EFF6FF;
+
+    color:#2563EB;
+
+    transform:translateX(6px);
+
+    box-shadow:0 8px 20px rgba(37,99,235,.12);
+
+}
+
+/* Active Menu */
+
+.menu-item.active{
+
+    background:linear-gradient(90deg,#EFF6FF,#DBEAFE);
+
+    color:#2563EB;
+
+    border-left:5px solid #2563EB;
+
+    box-shadow:
+        0 10px 20px rgba(37,99,235,.15);
+
+}
+
+/* Icon */
+
+.menu-icon{
+
+    width:42px;
+    height:42px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    border-radius:12px;
+
+    background:#F8FAFC;
+
+    color:#2563EB;
+
+    transition:.3s;
+
+    font-size:18px;
+
+}
+
+.menu-item:hover .menu-icon,
+.menu-item.active .menu-icon{
+
+    background:#2563EB;
+
+    color:#fff;
+
+    transform:rotate(-8deg) scale(1.05);
+
+}
+
+.menu-text{
+
+    font-size:15px;
+
+    letter-spacing:.3px;
+
+}
+/* ================= Logo ================= */
+/*==================================
+LOGO SECTION
+==================================*/
+
+.logo-section{
+    text-align:center;
+    padding:25px 15px 35px;
+    border-bottom:1px solid #E2E8F0;
+    margin-bottom:25px;
+}
+
+/*==================================
+LOGO CIRCLE
+==================================*/
+
+.logo-circle{
+    width:85px;
+    height:85px;
+    margin:0 auto 18px;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:38px;
+    color:#fff;
+
+    background:linear-gradient(
+        135deg,
+        #2563EB,
+        #06B6D4,
+        #10B981,
+        #2563EB
+    );
+    background-size:300% 300%;
+
+    box-shadow:
+        0 12px 30px rgba(37,99,235,.30);
+
+    animation:logoGradient 6s linear infinite,
+              logoFloat 4s ease-in-out infinite;
+}
+
+/*==================================
+LOGO TITLE
+==================================*/
+
+.logo-title{
+    margin:0;
+    font-size:26px;
+    font-weight:800;
+    letter-spacing:1px;
+
+    background:linear-gradient(
+        90deg,
+        #2563EB,
+        #06B6D4,
+        #10B981
+    );
+
+    background-size:300% 300%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    background-clip:text;
+
+    animation:logoGradient 6s linear infinite;
+}
+
+/*==================================
+LOGO SUBTITLE
+==================================*/
+
+.logo-subtitle{
+    display:block;
+    margin-top:8px;
+    font-size:13px;
+    font-weight:500;
+    color:#64748B;
+    letter-spacing:1px;
+    text-transform:uppercase;
+}
+
+/*==================================
+ANIMATIONS
+==================================*/
+
+@keyframes logoGradient{
+
+    0%{
+        background-position:0% 50%;
+    }
+
+    50%{
+        background-position:100% 50%;
+    }
+
+    100%{
+        background-position:0% 50%;
+    }
+
+}
+
+@keyframes logoFloat{
+
+    0%,100%{
+        transform:translateY(0);
+    }
+
+    50%{
+        transform:translateY(-8px);
+    }
+
+}
+
+/*==================================
+RESPONSIVE
+==================================*/
+
+@media(max-width:768px){
+
+    .logo-circle{
+        width:70px;
+        height:70px;
+        font-size:30px;
+    }
+
+    .logo-title{
+        font-size:22px;
+    }
+
+    .logo-subtitle{
+        font-size:12px;
+    }
+
+}
+
+
+
+/* ================= Content ================= */
+
+.main-content{
+    flex:1;
+    padding:30px;
+    background:#F8FAFC;
+    overflow-x:auto;
+}
+
+/* ================= Header ================= */
+
+.page-header{
+    background:#fff;
+    border-radius:16px;
+    padding:22px 30px;
+    margin-bottom:25px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+    border:1px solid #E2E8F0;
+}
+
+.page-header h2{
+    color:#1E40AF;
+    font-size:28px;
+    font-weight:700;
+}
+
+.page-header p{
+    color:#64748B;
+    margin-top:5px;
+}
+
+/* ================= Card ================= */
+
+.dashboard-card{
+    background:#fff;
+    border-radius:18px;
+    padding:25px;
+    border:1px solid #E2E8F0;
+    box-shadow:0 12px 30px rgba(0,0,0,.08);
+    transition:.35s;
+}
+
+.dashboard-card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 18px 35px rgba(37,99,235,.15);
+}
+
+/* ================= Title ================= */
+/*==================================
+PAGE TITLE
+==================================*/
+
+.page-title{
+    width:100%;
+    position:relative;
+    margin:0 0 35px;
+    padding-bottom:18px;
+    text-align:center;
+    font-size:34px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:2px;
+
+    background:linear-gradient(
+        90deg,
+        #2563EB,
+        #06B6D4,
+        #10B981,
+        #F59E0B,
+        #2563EB
+    );
+    background-size:300% 300%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    background-clip:text;
+
+    animation:titleGradient 6s linear infinite;
+}
+
+/* Full Width Underline */
+
+.page-title::after{
+    content:"";
+    position:absolute;
+    left:0;
+    bottom:0;
+    width:100%;
+    height:4px;
+    border-radius:20px;
+    background:linear-gradient(
+        90deg,
+        #2563EB,
+        #06B6D4,
+        #10B981,
+        #F59E0B,
+        #2563EB
+    );
+    background-size:300% 300%;
+    animation:titleGradient 6s linear infinite;
+    box-shadow:0 0 12px rgba(37,99,235,.35);
+}
+
+/* Gradient Animation */
+
+@keyframes titleGradient{
+    0%{
+        background-position:0% 50%;
+    }
+    50%{
+        background-position:100% 50%;
+    }
+    100%{
+        background-position:0% 50%;
+    }
+}
+/* ================= Responsive ================= */
+
+@media(max-width:992px){
+
+    .sidebar{
+        width:230px;
+    }
+
+    .main-content{
+        padding:20px;
+    }
+
+}
+
+@media(max-width:768px){
+
+    .superadmin-container{
+        flex-direction:column;
+    }
+
+    .sidebar{
+        position:relative;
+        width:100%;
+        min-height:auto;
+    }
+
+    .menu li{
+        padding:14px;
+    }
+
+    .page-header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:10px;
+    }
+
+}
+
+@media(max-width:480px){
+
+    .logo-circle{
+        width:65px;
+        height:65px;
+        font-size:30px;
+    }
+
+    .logo-title{
+        font-size:20px;
+    }
+
+    .page-header{
+        padding:18px;
+    }
+
+    .page-header h2{
+        font-size:22px;
+    }
+
+    .main-content{
+        padding:15px;
+    }
+
+}

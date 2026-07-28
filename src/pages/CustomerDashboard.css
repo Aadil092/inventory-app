@@ -1,0 +1,249 @@
+/*================================
+CUSTOMER DASHBOARD
+================================*/
+
+.customer-dashboard{
+    display:flex;
+    min-height:100vh;
+    background:#F8FAFC;
+    font-family:"Segoe UI",sans-serif;
+}
+
+/*================================
+SIDEBAR
+================================*/
+
+.customer-sidebar{
+    width:280px;
+    height:100vh;
+    position:sticky;
+    top:0;
+    overflow-y:auto;
+
+    background:#fff;
+
+    border-right:1px solid #E2E8F0;
+
+    box-shadow:8px 0 30px rgba(15,23,42,.08);
+
+    padding:28px 20px;
+}
+
+.customer-logo{
+    margin-bottom:35px;
+    text-align:center;
+}
+
+.customer-logo h1{
+    color:#2563EB;
+    font-size:28px;
+    font-weight:700;
+}
+
+/*================================
+MENU
+================================*/
+/*================================
+SIDEBAR MENU ITEM
+================================*/
+
+.customer-menu-item{
+    position:relative;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding:15px 18px;
+    margin-bottom:12px;
+    border-radius:14px;
+    cursor:pointer;
+    overflow:hidden;
+
+    color:#475569;
+    transition:all .35s ease;
+}
+
+/* Animated Background */
+
+.customer-menu-item::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:-100%;
+    width:100%;
+    height:100%;
+    background:linear-gradient(
+        135deg,
+        #2563EB,
+        #3B82F6
+    );
+    transition:.45s ease;
+    z-index:0;
+}
+.customer-menu-item::after{
+    content:"";
+    position:absolute;
+    left:0;
+    top:15%;
+    width:4px;
+    height:70%;
+    border-radius:10px;
+    background:#fff;
+    transform:scaleY(0);
+    transition:.35s;
+    z-index:2;
+}
+
+.customer-menu-item:hover::after,
+.customer-menu-item.active::after{
+    transform:scaleY(1);
+}
+/* Hover */
+
+.customer-menu-item:hover::before{
+    left:0;
+}
+
+.customer-menu-item:hover{
+    color:#fff;
+    transform:translateX(8px);
+    box-shadow:0 12px 30px rgba(37,99,235,.25);
+}
+
+/* Icon */
+
+.menu-icon{
+    position:relative;
+    z-index:2;
+    font-size:22px;
+    transition:.35s;
+}
+
+.customer-menu-item:hover .menu-icon{
+    transform:scale(1.2) rotate(-10deg);
+}
+
+/* Text */
+
+.menu-text{
+    position:relative;
+    z-index:2;
+    font-size:15px;
+    font-weight:600;
+    transition:.35s;
+}
+
+.customer-menu-item:hover .menu-text{
+    letter-spacing:.5px;
+}
+
+/* Active */
+
+.customer-menu-item.active{
+    background:linear-gradient(
+        135deg,
+        #2563EB,
+        #3B82F6
+    );
+    color:#fff;
+    box-shadow:0 12px 30px rgba(37,99,235,.30);
+}
+
+.customer-menu-item.active::before{
+    display:none;
+}
+
+/*================================
+CONTENT
+================================*/
+
+.customer-content{
+    flex:1;
+    padding:30px;
+    overflow-x:auto;
+}
+
+/*================================
+HEADER
+================================*/
+
+.customer-header{
+    background:#fff;
+
+    border-radius:20px;
+
+    padding:22px 28px;
+
+    margin-bottom:30px;
+
+    box-shadow:0 10px 30px rgba(15,23,42,.08);
+}
+
+.customer-header h2{
+    color:#0F172A;
+    font-size:28px;
+    margin-bottom:6px;
+}
+
+.customer-header p{
+    color:#64748B;
+    font-size:15px;
+}
+
+/*================================
+BODY
+================================*/
+
+.customer-body{
+    width:100%;
+}
+
+/*================================
+SCROLLBAR
+================================*/
+
+.customer-sidebar::-webkit-scrollbar{
+    width:6px;
+}
+
+.customer-sidebar::-webkit-scrollbar-thumb{
+    background:#2563EB;
+    border-radius:20px;
+}
+
+/*================================
+RESPONSIVE
+================================*/
+
+@media(max-width:992px){
+
+    .customer-dashboard{
+        flex-direction:column;
+    }
+
+    .customer-sidebar{
+        position:relative;
+        width:100%;
+        height:auto;
+    }
+
+    .customer-content{
+        padding:20px;
+    }
+
+}
+
+@media(max-width:768px){
+
+    .customer-menu-item{
+        padding:13px;
+    }
+
+    .customer-header{
+        padding:18px;
+    }
+
+    .customer-header h2{
+        font-size:22px;
+    }
+
+}

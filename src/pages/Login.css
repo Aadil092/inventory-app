@@ -1,0 +1,619 @@
+/* ===========================
+   Google Font
+=========================== */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+/* ===========================
+   Global
+=========================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Poppins',sans-serif;
+    background:#F8FAFC;
+}
+
+/* ===========================
+   Login Page
+=========================== */
+.login-page{
+    width:100%;
+    min-height:100vh;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    padding:30px;
+    overflow:hidden;
+    position:relative;
+
+    background:
+    radial-gradient(circle at top left,#DBEAFE 0%,transparent 35%),
+    radial-gradient(circle at bottom right,#DCFCE7 0%,transparent 35%),
+    linear-gradient(135deg,#F8FAFC,#EFF6FF,#F1F5F9);
+}
+
+/* Blue Glow */
+.login-page::before{
+    content:"";
+    position:absolute;
+    width:550px;
+    height:550px;
+    border-radius:50%;
+    background:#2563EB;
+    top:-180px;
+    left:-180px;
+    filter:blur(180px);
+    opacity:.25;
+    animation:blobOne 12s ease-in-out infinite alternate;
+}
+
+/* Green Glow */
+.login-page::after{
+    content:"";
+    position:absolute;
+    width:500px;
+    height:500px;
+    border-radius:50%;
+    background:#10B981;
+    right:-180px;
+    bottom:-180px;
+    filter:blur(180px);
+    opacity:.20;
+    animation:blobTwo 12s ease-in-out infinite alternate;
+}
+
+/* Floating Circle 1 */
+.circle1{
+    position:absolute;
+    width:180px;
+    height:180px;
+    border-radius:50%;
+    background:rgba(37,99,235,.15);
+    top:12%;
+    right:18%;
+    backdrop-filter:blur(20px);
+    animation:floatOne 8s infinite ease-in-out;
+}
+
+/* Floating Circle 2 */
+.circle2{
+    position:absolute;
+    width:120px;
+    height:120px;
+    border-radius:50%;
+    background:rgba(16,185,129,.15);
+    bottom:15%;
+    left:12%;
+    animation:floatTwo 7s infinite ease-in-out;
+}
+
+/* Floating Circle 3 */
+.circle3{
+    position:absolute;
+    width:90px;
+    height:90px;
+    border-radius:50%;
+    background:rgba(59,130,246,.18);
+    top:30%;
+    left:20%;
+    animation:floatThree 9s infinite ease-in-out;
+}
+
+/* Grid Pattern */
+.grid-pattern{
+    position:absolute;
+    inset:0;
+    background-image:
+    linear-gradient(rgba(37,99,235,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(37,99,235,.05) 1px,transparent 1px);
+    background-size:45px 45px;
+    animation:gridMove 20s linear infinite;
+    z-index:0;
+}
+
+/* ===================== */
+/* Animations */
+/* ===================== */
+
+@keyframes blobOne{
+    from{
+        transform:translate(0,0) scale(1);
+    }
+    to{
+        transform:translate(100px,80px) scale(1.2);
+    }
+}
+
+@keyframes blobTwo{
+    from{
+        transform:translate(0,0) scale(1);
+    }
+    to{
+        transform:translate(-90px,-70px) scale(1.15);
+    }
+}
+
+@keyframes floatOne{
+    0%,100%{
+        transform:translateY(0px);
+    }
+    50%{
+        transform:translateY(-25px);
+    }
+}
+
+@keyframes floatTwo{
+    0%,100%{
+        transform:translateY(0px);
+    }
+    50%{
+        transform:translateY(20px);
+    }
+}
+
+@keyframes floatThree{
+    0%,100%{
+        transform:translateX(0px);
+    }
+    50%{
+        transform:translateX(25px);
+    }
+}
+
+@keyframes gridMove{
+    from{
+        transform:translate(0,0);
+    }
+    to{
+        transform:translate(45px,45px);
+    }
+}
+
+@keyframes moveOne{
+
+0%{
+transform:translate(0,0);
+}
+
+100%{
+transform:translate(120px,80px);
+}
+
+}
+
+@keyframes moveTwo{
+
+0%{
+transform:translate(0,0);
+}
+
+100%{
+transform:translate(-100px,-80px);
+}
+
+}
+
+/* ===========================
+   Login Card
+=========================== */
+/* ===========================
+   Glass Card Border
+=========================== */
+.login-form{
+    position:relative;
+    width:100%;
+    padding:45px;
+    border-radius:24px;
+
+    background:rgba(255,255,255,.92);
+    backdrop-filter:blur(25px);
+    -webkit-backdrop-filter:blur(25px);
+
+    border:1px solid rgba(255,255,255,.35);
+
+    overflow:hidden;
+    z-index:1;
+
+    box-shadow:
+        0 20px 50px rgba(15,23,42,.12);
+}
+
+/* Animated Gradient Border */
+.login-form::before{
+    content:"";
+    position:absolute;
+    inset:-2px;
+    border-radius:24px;
+    background:linear-gradient(
+        135deg,
+        #2563EB,
+        #3B82F6,
+        #10B981,
+        #06B6D4,
+        #2563EB
+    );
+    background-size:300% 300%;
+    animation:borderMove 6s linear infinite;
+    z-index:-2;
+}
+
+/* White Glass Layer */
+.login-form::after{
+    content:"";
+    position:absolute;
+    inset:2px;
+    border-radius:22px;
+    background:rgba(255,255,255,.92);
+    backdrop-filter:blur(25px);
+    -webkit-backdrop-filter:blur(25px);
+    z-index:-1;
+}
+
+/* Hover Effect */
+.login-form:hover{
+    transform:translateY(-4px);
+    transition:.35s;
+    box-shadow:
+        0 25px 60px rgba(37,99,235,.18),
+        0 0 35px rgba(16,185,129,.12);
+}
+
+/* Border Animation */
+@keyframes borderMove{
+
+    0%{
+        background-position:0% 50%;
+    }
+
+    50%{
+        background-position:100% 50%;
+    }
+
+    100%{
+        background-position:0% 50%;
+    }
+
+}
+
+.login-form{
+    border:2px solid transparent;
+    background:
+        linear-gradient(#ffffff,#ffffff) padding-box,
+        linear-gradient(135deg,#2563EB,#10B981,#06B6D4,#2563EB) border-box;
+
+    border-radius:24px;
+
+    animation:borderMove 6s linear infinite;
+
+    box-shadow:
+        0 0 20px rgba(37,99,235,.20),
+        0 0 40px rgba(16,185,129,.10);
+}
+
+@keyframes popup{
+
+0%{
+opacity:0;
+transform:translateY(60px) scale(.92);
+}
+
+100%{
+opacity:1;
+transform:translateY(0) scale(1);
+}
+
+}
+
+/* ===========================
+   Logo
+=========================== */
+
+.login-logo{
+    width:50px;
+    height:50px;
+    margin:auto;
+    margin-bottom:20px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#2563EB,#3B82F6);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:#fff;
+    font-size:40px;
+    box-shadow:0 20px 40px rgba(37,99,235,.30);
+    animation:floating 3s ease-in-out infinite;
+}
+
+@keyframes floating{
+
+0%,100%{
+transform:translateY(0);
+}
+
+50%{
+transform:translateY(-10px);
+}
+
+}
+
+/* ===========================
+   Heading
+=========================== */
+
+.login-title{
+    text-align:center;
+    font-size:30px;
+    color:#0F172A;
+    font-weight:700;
+    margin-bottom:8px;
+}
+
+.login-sub{
+    text-align:center;
+    color:#64748B;
+    font-size:15px;
+    margin-bottom:30px;
+}
+
+/* ===========================
+   Error Box
+=========================== */
+
+.error-box{
+    background:#FEF2F2;
+    color:#DC2626;
+    border:1px solid #FECACA;
+    padding:12px;
+    border-radius:10px;
+    margin-bottom:20px;
+    font-size:14px;
+}
+
+/* ===========================
+   Inputs
+=========================== */
+
+.input-group{
+    margin-bottom:22px;
+}
+
+.input-group label{
+    display:block;
+    margin-bottom:8px;
+    font-size:14px;
+    font-weight:600;
+    color:#334155;
+}
+
+.login-input{
+
+    width:100%;
+    padding:15px 18px;
+
+    border-radius:14px;
+
+    border:1px solid rgba(255,255,255,.35);
+
+    background:rgba(255,255,255,.35);
+
+    backdrop-filter:blur(12px);
+
+    color:#0F172A;
+
+    font-size:15px;
+
+    transition:.35s;
+
+    outline:none;
+
+}
+
+.login-input::placeholder{
+
+color:#64748B;
+
+}
+
+.login-input:focus{
+
+background:rgba(255,255,255,.6);
+
+border-color:#3B82F6;
+
+box-shadow:
+0 0 0 4px rgba(59,130,246,.15),
+0 15px 30px rgba(59,130,246,.15);
+
+}
+
+.glass-circle{
+
+position:absolute;
+border-radius:50%;
+backdrop-filter:blur(25px);
+background:rgba(255,255,255,.12);
+border:1px solid rgba(255,255,255,.25);
+
+animation:float 6s ease-in-out infinite;
+
+}
+
+.circle1{
+
+width:120px;
+height:120px;
+top:10%;
+left:12%;
+
+}
+
+.circle2{
+
+width:80px;
+height:80px;
+bottom:15%;
+right:18%;
+
+animation-delay:2s;
+
+}
+
+.circle3{
+
+width:60px;
+height:60px;
+top:22%;
+right:15%;
+
+animation-delay:4s;
+
+}
+
+@keyframes float{
+
+0%,100%{
+
+transform:translateY(0px);
+
+}
+
+50%{
+
+transform:translateY(-20px);
+
+}
+
+}
+
+/* ===========================
+   Remember
+=========================== */
+
+.remember-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+    font-size:14px;
+}
+
+.remember-row label{
+    color:#475569;
+}
+
+.forgot-link{
+    text-decoration:none;
+    color:#2563EB;
+    font-weight:600;
+}
+
+.forgot-link:hover{
+    color:#1D4ED8;
+}
+
+/* ===========================
+   Button
+=========================== */
+
+.login-btn{
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:14px;
+    cursor:pointer;
+    background:linear-gradient(135deg,#2563EB,#3B82F6);
+    color:#fff;
+    font-size:16px;
+    font-weight:600;
+    transition:.35s;
+    box-shadow:0 15px 30px rgba(37,99,235,.25);
+}
+
+.login-btn:hover{
+    transform:translateY(-4px);
+    box-shadow:0 25px 40px rgba(37,99,235,.35);
+}
+
+.login-btn:active{
+    transform:scale(.98);
+}
+
+/* ===========================
+   Responsive
+=========================== */
+
+@media(max-width:768px){
+
+.login-page{
+padding:20px;
+}
+
+.login-card{
+max-width:100%;
+}
+
+.login-form{
+padding:32px;
+}
+
+.login-title{
+font-size:26px;
+}
+
+.logo{
+width:80px;
+height:80px;
+font-size:34px;
+}
+
+}
+
+@media(max-width:480px){
+
+.login-page{
+padding:15px;
+}
+
+.login-form{
+padding:24px;
+border-radius:18px;
+}
+
+.logo{
+width:90px;
+height:90px;
+font-size:30px;
+}
+
+.login-title{
+font-size:22px;
+}
+
+.login-sub{
+font-size:14px;
+}
+
+.login-input{
+padding:13px;
+font-size:14px;
+}
+
+.login-btn{
+padding:14px;
+font-size:15px;
+}
+
+.remember-row{
+flex-direction:column;
+align-items:flex-start;
+gap:10px;
+}
+
+}

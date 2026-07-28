@@ -1,0 +1,397 @@
+/* ===============================
+   MANAGE ORDER
+==================================*/
+
+.manage-order{
+    width:100%;
+}
+
+/*================================
+SEARCH BAR
+================================*/
+
+.order-search{
+    width:100%;
+    margin-bottom:25px;
+}
+
+.order-search input{
+    width:100%;
+    padding:15px 18px;
+    border-radius:14px;
+    border:2px solid #E2E8F0;
+    background:#fff;
+    font-size:15px;
+    color:#334155;
+    transition:.35s;
+    outline:none;
+}
+
+.order-search input:focus{
+    border-color:#2563EB;
+    box-shadow:0 0 0 5px rgba(37,99,235,.12);
+}
+
+.order-search input::placeholder{
+    color:#94A3B8;
+}
+
+/*================================
+TABLE CARD
+================================*/
+
+.order-table-card{
+    background:#fff;
+    border-radius:24px;
+    padding:20px;
+    overflow-x:auto;
+    box-shadow:0 15px 35px rgba(15,23,42,.08);
+    border:1px solid #E2E8F0;
+    position:relative;
+}
+
+.order-table{
+    width:100%;
+    min-width:1100px;
+    border-collapse:collapse;
+    background:transparent;
+}
+/*================================
+TABLE HEADER
+================================*/
+
+.order-table thead{
+    background:#F8FAFC;
+}
+
+.order-table th{
+    padding:18px;
+    color:#1E293B;
+    font-size:15px;
+    font-weight:700;
+    text-align:left;
+    border-bottom:1px solid #E2E8F0;
+}
+
+/*================================
+TABLE BODY
+================================*/
+
+.order-table td{
+    padding:18px;
+    color:#475569;
+    border-bottom:1px solid #EEF2F7;
+}
+
+.order-table tbody tr{
+    transition:.35s;
+}
+
+.order-table tbody tr:hover{
+    background:#F8FAFC;
+}
+
+/*================================
+CUSTOMER
+================================*/
+
+.customer-info{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.customer-avatar{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:#DBEAFE;
+    color:#2563EB;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+}
+
+.customer-name{
+    font-weight:600;
+    color:#0F172A;
+}
+
+/*================================
+BADGES
+================================*/
+
+.qty-badge{
+    display:inline-block;
+    padding:7px 14px;
+    border-radius:30px;
+    background:#DBEAFE;
+    color:#2563EB;
+    font-weight:600;
+}
+
+.price{
+    color:#16A34A;
+    font-weight:700;
+}
+
+.payment-badge{
+    display:inline-block;
+    padding:7px 15px;
+    border-radius:30px;
+    font-size:13px;
+    font-weight:600;
+}
+
+.payment-cash{
+    background:#DCFCE7;
+    color:#15803D;
+}
+
+.payment-online{
+    background:#DBEAFE;
+    color:#2563EB;
+}
+
+/*================================
+BUTTONS
+================================*/
+
+.manage-order-action-buttons{
+    display:flex;
+    gap:10px;
+}
+
+.view-btn{
+    padding:10px 18px;
+    border:2px solid #2563EB;
+    border-radius:12px;
+    background:#fff;
+    color:#2563EB;
+    cursor:pointer;
+    font-weight:600;
+    transition:.35s;
+}
+
+.view-btn:hover{
+    background:#2563EB;
+    color:#fff;
+    transform:translateY(-2px);
+}
+
+.delete-btn{
+    padding:10px 18px;
+    border:2px solid #EF4444;
+    border-radius:12px;
+    background:#fff;
+    color:#EF4444;
+    cursor:pointer;
+    font-weight:600;
+    transition:.35s;
+}
+
+.delete-btn:hover{
+    background:#EF4444;
+    color:#fff;
+    transform:translateY(-2px);
+}
+
+/*================================
+MODAL
+================================*/
+/*================================
+MODAL
+================================*/
+/*================================
+MODAL
+================================*/
+
+.order-modal{
+    position:fixed;
+    inset:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:rgba(15,23,42,.55);
+    backdrop-filter:blur(8px);
+    z-index:1000;
+    padding:20px;
+}
+
+.order-modal-card{
+    position:relative;
+    width:520px;
+    max-width:95%;
+    border-radius:24px;
+    padding:2px;
+}
+
+.order-modal-card::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:24px;
+    background:linear-gradient(
+        135deg,
+        #2563EB,
+        #3B82F6,
+        #10B981,
+        #06B6D4,
+        #2563EB
+    );
+    background-size:300% 300%;
+    animation:borderMove 7s linear infinite;
+}
+
+.order-modal-inner{
+    position:relative;
+    z-index:2;
+    background:#fff;
+    border-radius:22px;
+    overflow:hidden;
+}
+
+/*==============================
+HEADER
+==============================*/
+
+.modal-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px 24px;
+    background:#F8FAFC;
+    border-bottom:1px solid #E2E8F0;
+}
+
+.modal-header h2{
+    margin:0;
+    color:#1E293B;
+    font-size:22px;
+    font-weight:700;
+}
+
+/*==============================
+HEADER CLOSE BUTTON
+==============================*/
+
+.model-close-btn{
+     width:100%; 
+     margin-top:25px; 
+     padding:15px; 
+     border:2px solid #2563EB;
+      border-radius:14px; 
+      background:#fff; 
+      color:#2563EB; 
+      font-size:15px; 
+      font-weight:600; 
+      cursor:pointer;
+       transition:.35s ease;
+    
+    } 
+    
+    
+.model-close-btn:hover{ 
+    background:#2563EB; 
+    color:#fff; 
+    transform:translateY(-2px); 
+    box-shadow:0 10px 25px rgba(37,99,235,.25); 
+} 
+
+.model-close-btn:active{ 
+    transform:scale(.98); 
+} 
+
+/*==============================
+BODY
+==============================*/
+
+.modal-body{
+    padding:25px;
+}
+
+.detail-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:20px;
+    padding:15px 0;
+    border-bottom:1px solid #EEF2F7;
+}
+
+.detail-row:last-child{
+    border-bottom:none;
+}
+
+.detail-row span{
+    color:#64748B;
+    font-weight:600;
+}
+
+.detail-row strong{
+    text-align:right;
+    max-width:65%;
+    word-break:break-word;
+}
+
+/*==============================
+PRICE
+==============================*/
+
+.order-price{
+    
+    color:#16A34A;
+    font-weight:700;
+}
+
+
+
+/*================================
+ANIMATION
+================================*/
+
+@keyframes borderMove{
+
+    0%{
+        background-position:0% 50%;
+    }
+
+    50%{
+        background-position:100% 50%;
+    }
+
+    100%{
+        background-position:0% 50%;
+    }
+
+}
+
+/*================================
+RESPONSIVE
+================================*/
+
+@media(max-width:992px){
+
+    .order-modal-card{
+        width:95%;
+    }
+
+    .order-table{
+        min-width:1000px;
+    }
+
+}
+
+@media(max-width:768px){
+
+    .order-search input{
+        font-size:14px;
+    }
+
+    .order-table th,
+    .order-table td{
+        padding:14px;
+    }
+
+}

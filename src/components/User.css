@@ -1,0 +1,1213 @@
+
+/*==================================
+USER PAGE LAYOUT
+==================================*/
+
+.user-page{
+    width:100%;
+    display:flex;
+    gap:30px;
+    align-items:flex-start;
+    padding:10px;
+    box-sizing:border-box;
+}
+
+/*==================================
+LEFT SIDE
+==================================*/
+
+.user-left{
+    flex:0 0 380px;
+    width:38px;
+    position:sticky;
+    top:10px;
+}
+
+/*==================================
+RIGHT SIDE
+==================================*/
+
+.user-right{
+    flex:1.2;
+    min-width:0;
+    width:100%;
+}
+
+/*==================================
+RIGHT TABLE CARD
+==================================*/
+
+.user-table-card{
+    width:50%;
+    overflow:auto;
+}
+
+/*==================================
+FORM CARD
+==================================*/
+
+.user-form-card{
+    width:50%;
+}
+
+/*==================================
+TABLE
+==================================*/
+
+.user-table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+/*==================================
+LARGE SCREEN
+==================================*/
+
+@media (min-width:1600px){
+
+    .user-left{
+        flex:0 0 420px;
+        max-width:420px;
+    }
+
+}
+
+/*==================================
+TABLET
+==================================*/
+
+@media (max-width:1200px){
+
+    .user-page{
+        gap:20px;
+    }
+
+    .user-left{
+        flex:0 0 340px;
+        max-width:340px;
+    }
+
+}
+
+/*==================================
+MOBILE
+==================================*/
+
+@media (max-width:992px){
+
+    .user-page{
+        flex-direction:column;
+    }
+
+    .user-left{
+        width:100%;
+        max-width:100%;
+        position:static;
+    }
+
+    .user-right{
+        width:100%;
+    }
+
+    .user-table{
+        min-width:900px;
+    }
+
+}
+
+/*=====================================
+TOP BAR
+======================================*/
+
+.user-topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:18px;
+    flex-wrap:wrap;
+    margin-bottom:25px;
+}
+
+/*=====================================
+SEARCH
+======================================*/
+
+.user-search{
+    flex:1;
+    min-width:320px;
+}
+
+.user-search input{
+    width:100%;
+    padding:15px 18px;
+    border-radius:14px;
+    border:2px solid #E2E8F0;
+    background:#fff;
+    font-size:15px;
+    color:#334155;
+    outline:none;
+    transition:.35s;
+}
+
+.user-search input::placeholder{
+    color:#94A3B8;
+}
+
+.user-search input:focus{
+    border-color:#2563EB;
+    box-shadow:0 0 0 5px rgba(37,99,235,.12);
+}
+
+/*=====================================
+ADD USER BUTTON
+======================================*/
+
+.add-user-btn{
+    padding:14px 30px;
+    border:2px solid #2563EB;
+    border-radius:14px;
+    background:#fff;
+    color:#2563EB;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.35s;
+}
+
+.add-user-btn:hover{
+    background:#16A34A;
+    border-color:#16A34A;
+    color:#fff;
+    transform:translateY(-3px);
+    box-shadow:0 18px 30px rgba(22,163,74,.25);
+}
+
+.add-user-btn:active{
+    transform:scale(.97);
+}
+
+/*=====================================
+MODAL
+======================================*/
+
+.user-modal{
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,.55);
+    backdrop-filter:blur(8px);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:999;
+    padding:20px;
+}
+
+/*==============================
+USER FORM CARD
+==============================*/
+
+.user-form-card{
+    position:relative;
+    width:380px;
+    border-radius:24px;
+    padding:2px;
+    overflow:hidden;
+}
+
+.user-form-card::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:24px;
+    background:linear-gradient(
+        135deg,
+        #2563EB,
+        #3B82F6,
+        #10B981,
+        #06B6D4,
+        #2563EB
+    );
+    background-size:300% 300%;
+    animation:borderMove 7s linear infinite;
+}
+
+.user-form-card::after{
+    content:"";
+    position:absolute;
+    inset:2px;
+    background:#fff;
+    border-radius:22px;
+}
+
+.user-form{
+    position:relative;
+    z-index:2;
+    padding:28px;
+}
+.user-form-body{
+    position:relative;
+    z-index:2;
+    padding:0 28px 28px;
+}
+
+.user-form{
+    display:flex;
+    flex-direction:column;
+}
+/*==============================
+HEADER
+==============================*/
+
+.user-form-header{
+    position:relative;
+    z-index:2;
+    text-align:center;
+    padding:30px 25px 15px;
+}
+
+.user-form-header h2{
+    font-size:28px;
+    color:#1E293B;
+    margin-bottom:8px;
+    font-weight:700;
+}
+
+.user-form-header p{
+    color:#64748B;
+    font-size:14px;
+}
+
+/*==============================
+FORM
+==============================*/
+
+.form-group{
+    margin-bottom:18px;
+}
+
+.form-group label{
+    display:block;
+    margin-bottom:8px;
+    color:#334155;
+    font-size:14px;
+    font-weight:600;
+}
+
+.form-group input,
+.form-group select{
+    width:100%;
+    padding:14px 16px;
+    border:2px solid #E2E8F0;
+    border-radius:14px;
+    background:#fff;
+    font-size:15px;
+    color:#334155;
+    outline:none;
+    transition:.35s;
+    box-sizing:border-box;
+}
+
+.form-group input::placeholder{
+    color:#94A3B8;
+}
+
+.form-group input:focus,
+.form-group select:focus{
+    border-color:#2563EB;
+    box-shadow:0 0 0 5px rgba(37,99,235,.12);
+}
+
+/*==============================
+BUTTONS
+==============================*/
+
+.button-group{
+    display:flex;
+    gap:5px;
+    margin-top:25px;
+}
+
+.save-btn{
+    flex:1;
+    padding:14px;
+    background:#fff;
+    border:2px solid #16A34A;
+    border-radius:14px;
+    color:#000000;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.35s;
+}
+
+.save-btn:hover{
+    background:#16A34A;
+    color:#16A34A;
+    transform:translateY(-2px);
+    box-shadow:0 12px 25px rgba(22,163,74,.25);
+}
+
+.cancel-btn{
+    flex:1;
+    padding:14px;
+    background:#fff;
+    border:2px solid #EF4444;
+    border-radius:14px;
+    color:#EF4444;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.35s;
+}
+
+.cancel-btn:hover{
+    background:#EF4444;
+    color:#fff;
+    transform:translateY(-2px);
+    box-shadow:0 12px 25px rgba(239,68,68,.25);
+}
+
+/*==============================
+ANIMATION
+==============================*/
+
+@keyframes borderMove{
+
+    0%{
+        background-position:0% 50%;
+    }
+
+    50%{
+        background-position:100% 50%;
+    }
+
+    100%{
+        background-position:0% 50%;
+    }
+
+}
+
+/*==============================
+RESPONSIVE
+==============================*/
+
+@media(max-width:992px){
+
+    .user-form-card{
+        width:100%;
+    }
+
+}
+
+@media(max-width:768px){
+
+    .user-form{
+        padding:20px;
+    }
+
+    .button-group{
+        flex-direction:column;
+    }
+
+}
+/*=====================================
+USER TABLE CARD
+======================================*/
+/* ===============================
+   USER TABLE
+================================= */
+
+.user-table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:650px;
+    background:#fff;
+}
+
+/* Table Header */
+
+.user-table thead{
+    background:#F8FAFC;
+}
+
+.user-table thead tr{
+    border-bottom:2px solid #E2E8F0;
+}
+
+.user-table th{
+    padding:18px;
+    text-align:left;
+    font-size:15px;
+    font-weight:700;
+    color:#1E293B;
+    white-space:nowrap;
+}
+
+/* Table Body */
+
+.user-table td{
+    padding:18px;
+    border-bottom:1px solid #EEF2F7;
+    color:#475569;
+    font-size:14px;
+    vertical-align:middle;
+}
+
+.user-table tbody tr{
+    transition:all .35s ease;
+}
+
+.user-table tbody tr:hover{
+    background:#F8FAFC;
+}
+
+/* ID Circle */
+
+.id-circle{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    background:#DBEAFE;
+    color:#2563EB;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+    font-size:15px;
+}
+
+/* User Name */
+
+.user-name{
+    font-weight:600;
+    color:#0F172A;
+    letter-spacing:.3px;
+}
+
+/* Role Badge */
+
+.role-badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:8px 16px;
+    border-radius:30px;
+    font-size:13px;
+    font-weight:600;
+    text-transform:capitalize;
+}
+
+/* Admin */
+
+.role-admin{
+    background:#DBEAFE;
+    color:#2563EB;
+}
+
+/* Warehouse Staff */
+
+.role-warehousestaff{
+    background:#FEF3C7;
+    color:#D97706;
+}
+
+/* Customer */
+
+.role-customer{
+    background:#DCFCE7;
+    color:#16A34A;
+}
+
+/* Super Admin */
+
+.role-superadmin{
+    background:#EDE9FE;
+    color:#7C3AED;
+}
+
+/* Action Buttons */
+
+.action-buttons{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+/* Common Button */
+
+.action-buttons button{
+    padding:9px 18px;
+    border-radius:12px;
+    border:2px solid transparent;
+    background:#fff;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:600;
+    transition:all .35s ease;
+}
+/*================================
+ACTION BUTTONS
+================================*/
+
+.User-action-buttons{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+/*================================
+COMMON BUTTON STYLE
+================================*/
+
+.edit-btn,
+.view-btn,
+.delete-btn{
+    padding:10px 20px;
+    border:2px solid;
+    border-radius:12px;
+    background:#fff;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    transition:all .35s ease;
+}
+
+.edit-btn:active,
+.view-btn:active,
+.delete-btn:active{
+    transform:scale(.96);
+}
+
+/*================================
+EDIT BUTTON
+================================*/
+
+.edit-btn{
+    border-color:#2563EB;
+    color:#2563EB;
+}
+
+.edit-btn:hover{
+    background:#2563EB;
+    color:#fff;
+    transform:translateY(-2px);
+    box-shadow:0 10px 22px rgba(37,99,235,.25);
+}
+
+/*================================
+VIEW BUTTON
+================================*/
+
+.view-btn{
+    border-color:#16A34A;
+    color:#16A34A;
+}
+
+.view-btn:hover{
+    background:#16A34A;
+    color:#fff;
+    transform:translateY(-2px);
+    box-shadow:0 10px 22px rgba(22,163,74,.25);
+}
+
+/*================================
+DELETE BUTTON
+================================*/
+
+.delete-btn{
+    border-color:#EF4444;
+    color:#EF4444;
+}
+
+.delete-btn:hover{
+    background:#EF4444;
+    color:#fff;
+    transform:translateY(-2px);
+    box-shadow:0 10px 22px rgba(239,68,68,.25);
+}
+
+
+/* Empty Row */
+
+.empty{
+    text-align:center;
+    padding:35px;
+    color:#94A3B8;
+    font-size:15px;
+    font-weight:500;
+}
+
+/* Responsive */
+
+@media(max-width:768px){
+
+    .user-table{
+        min-width:700px;
+    }
+
+    .user-table th,
+    .user-table td{
+        padding:14px;
+    }
+
+    .action-buttons{
+        gap:8px;
+    }
+
+    .action-buttons button{
+        padding:8px 14px;
+        font-size:13px;
+    }
+}
+
+
+/*=====================================
+USER INFO
+======================================*/
+
+.user-info{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.user-avatar{
+    width:45px;
+    height:45px;
+    border-radius:50%;
+    background:#DBEAFE;
+    color:#2563EB;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:17px;
+    font-weight:700;
+}
+
+.user-name{
+    font-size:15px;
+    font-weight:600;
+    color:#0F172A;
+}
+
+.user-email{
+    font-size:13px;
+    color:#64748B;
+    margin-top:4px;
+}
+
+/*=====================================
+ROLE BADGES
+======================================*/
+
+.role-badge{
+    display:inline-block;
+    padding:7px 16px;
+    border-radius:30px;
+    font-size:13px;
+    font-weight:600;
+}
+
+.role-admin{
+    background:#DBEAFE;
+    color:#2563EB;
+}
+
+.role-superadmin{
+    background:#DCFCE7;
+    color:#15803D;
+}
+
+.role-staff{
+    background:#FEF3C7;
+    color:#D97706;
+}
+
+.role-customer{
+    background:#F3E8FF;
+    color:#9333EA;
+}
+
+/*=====================================
+STATUS BADGES
+======================================*/
+
+.status-badge{
+    display:inline-block;
+    padding:7px 16px;
+    border-radius:30px;
+    font-size:13px;
+    font-weight:600;
+}
+
+.status-active{
+    background:#DCFCE7;
+    color:#15803D;
+}
+
+.status-inactive{
+    background:#FEE2E2;
+    color:#DC2626;
+}
+
+/*=====================================
+ACTION BUTTONS
+======================================*/
+
+.user-actions{
+    display:flex;
+    gap:10px;
+}
+
+.user-edit-btn{
+    padding:10px 18px;
+    border:2px solid #2563EB;
+    border-radius:12px;
+    background:#fff;
+    color:#2563EB;
+    font-weight:600;
+    cursor:pointer;
+    transition:.35s;
+}
+
+.user-edit-btn:hover{
+    background:#2563EB;
+    color:#fff;
+    transform:translateY(-2px);
+}
+
+.user-delete-btn{
+    padding:10px 18px;
+    border:2px solid #EF4444;
+    border-radius:12px;
+    background:#fff;
+    color:#EF4444;
+    font-weight:600;
+    cursor:pointer;
+    transition:.35s;
+}
+
+.user-delete-btn:hover{
+    background:#EF4444;
+    color:#fff;
+    transform:translateY(-2px);
+}
+
+/*=====================================
+NO DATA
+======================================*/
+
+.user-no-data{
+    text-align:center;
+    padding:45px;
+    color:#94A3B8;
+    font-size:16px;
+    font-weight:500;
+}
+
+/*=====================================
+VIEW MODAL
+======================================*/
+
+.user-view-modal{
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,.55);
+    backdrop-filter:blur(8px);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+    padding:20px;
+}
+
+.user-view-card{
+    position:relative;
+    width:480px;
+    max-width:95%;
+    padding:2px;
+    border-radius:24px;
+}
+
+.user-view-card::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:24px;
+    background:linear-gradient(
+        135deg,
+        #2563EB,
+        #3B82F6,
+        #10B981,
+        #06B6D4,
+        #2563EB
+    );
+    background-size:300% 300%;
+    animation:borderMove 7s linear infinite;
+}
+
+.user-view-inner{
+    position:relative;
+    z-index:2;
+    background:#fff;
+    border-radius:22px;
+    overflow:hidden;
+}
+
+.user-view-header{
+    background:#F8FAFC;
+    padding:22px;
+    border-bottom:1px solid #E2E8F0;
+    text-align:center;
+}
+
+.user-view-header h2{
+    margin:0;
+    color:#1E293B;
+}
+
+.user-view-body{
+    padding:25px;
+}
+
+.user-detail{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 0;
+    border-bottom:1px solid #EEF2F7;
+}
+
+.user-detail span{
+    color:#64748B;
+}
+
+.user-detail strong{
+    color:#0F172A;
+}
+
+.user-close-view{
+    width:100%;
+    margin-top:25px;
+    padding:14px;
+    border:2px solid #2563EB;
+    border-radius:12px;
+    background:#fff;
+    color:#2563EB;
+    font-weight:600;
+    cursor:pointer;
+    transition:.35s;
+}
+
+.user-close-view:hover{
+    background:#2563EB;
+    color:#fff;
+    box-shadow:0 12px 30px rgba(37,99,235,.25);
+}
+
+/*=====================================
+RESPONSIVE
+======================================*/
+
+@media(max-width:992px){
+
+    .user-table{
+        min-width:1000px;
+    }
+
+    .user-btn-group{
+        flex-direction:column;
+    }
+
+}
+
+@media(max-width:768px){
+
+    .user-topbar{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .user-search{
+        min-width:100%;
+    }
+
+    .add-user-btn{
+        width:100%;
+    }
+
+    .user-form{
+        padding:20px;
+    }
+
+    .user-table th,
+    .user-table td{
+        padding:14px;
+    }
+
+    .user-view-card{
+        width:95%;
+    }
+
+}
+/*=====================================
+USER VIEW MODAL
+======================================*/
+
+.user-modal{
+    position:fixed;
+    inset:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:rgba(15,23,42,.55);
+    backdrop-filter:blur(8px);
+    z-index:1000;
+    padding:20px;
+}
+
+/*=====================================
+MODAL CARD
+======================================*/
+
+.user-modal-card{
+    position:relative;
+    width:520px;
+    max-width:95%;
+    border-radius:24px;
+    padding:2px;
+}
+
+.user-modal-card::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:24px;
+    background:linear-gradient(
+        135deg,
+        #2563EB,
+        #3B82F6,
+        #10B981,
+        #06B6D4,
+        #2563EB
+    );
+    background-size:300% 300%;
+    animation:borderMove 7s linear infinite;
+}
+
+.user-modal-inner{
+    position:relative;
+    background:#fff;
+    border-radius:22px;
+    overflow:hidden;
+    z-index:2;
+}
+
+/*=====================================
+HEADER
+======================================*/
+
+.user-modal-header{
+    background:#F8FAFC;
+    border-bottom:1px solid #E2E8F0;
+    padding:30px;
+    text-align:center;
+    position:relative;
+}
+
+.user-avatar{
+    width:80px;
+    height:80px;
+    margin:auto;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:32px;
+    font-weight:700;
+    color:#2563EB;
+    background:#DBEAFE;
+    border:3px solid #2563EB;
+}
+
+.user-modal-header h2{
+    margin-top:18px;
+    color:#0F172A;
+    font-size:24px;
+    font-weight:700;
+}
+
+/*=====================================
+BODY
+======================================*/
+
+.user-modal-body{
+    padding:25px;
+}
+
+.user-detail-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    padding:15px 0;
+    border-bottom:1px solid #EEF2F7;
+}
+
+.user-detail-row span{
+    color:#64748B;
+    font-weight:600;
+}
+
+.user-detail-row strong{
+    color:#0F172A;
+    text-align:right;
+    max-width:60%;
+    word-break:break-word;
+}
+
+/*=====================================
+STATUS BADGE
+======================================*/
+
+.status-badge{
+    padding:8px 18px;
+    border-radius:30px;
+    font-size:13px;
+    font-weight:600;
+}
+
+.status-active{
+    background:#DCFCE7;
+    color:#15803D;
+}
+
+.status-deactive{
+    background:#FEF3C7;
+    color:#D97706;
+}
+
+.status-blocked{
+    background:#FEE2E2;
+    color:#DC2626;
+}
+
+/*=====================================
+SELECT
+======================================*/
+
+.status-select{
+    width:100%;
+    margin-top:20px;
+    padding:14px 16px;
+    border:2px solid #E2E8F0;
+    border-radius:12px;
+    background:#fff;
+    font-size:15px;
+    transition:.35s;
+    outline:none;
+}
+
+.status-select:focus{
+    border-color:#2563EB;
+    box-shadow:0 0 0 4px rgba(37,99,235,.12);
+}
+
+/*=====================================
+BUTTONS
+======================================*/
+
+.user-modal-buttons{
+    display:flex;
+    gap:15px;
+    margin-top:30px;
+}
+
+.save-status-btn{
+    flex:1;
+    padding:14px;
+    border:2px solid #16A34A;
+    border-radius:12px;
+    background:#fff;
+    color:#16A34A;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:600;
+    transition:.35s;
+}
+
+.save-status-btn:hover{
+    background:#16A34A;
+    color:#fff;
+    transform:translateY(-2px);
+    box-shadow:0 12px 25px rgba(22,163,74,.20);
+}
+
+.close-user-btn{
+    flex:1;
+    padding:14px;
+    border:2px solid #EF4444;
+    border-radius:12px;
+    background:#fff;
+    color:#EF4444;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:600;
+    transition:.35s;
+}
+
+.close-user-btn:hover{
+    background:#EF4444;
+    color:#fff;
+    transform:translateY(-2px);
+    box-shadow:0 12px 25px rgba(239,68,68,.20);
+}
+
+/*=====================================
+ANIMATION
+======================================*/
+
+@keyframes borderMove{
+
+    0%{
+        background-position:0% 50%;
+    }
+
+    50%{
+        background-position:100% 50%;
+    }
+
+    100%{
+        background-position:0% 50%;
+    }
+
+}
+
+/*=====================================
+RESPONSIVE
+======================================*/
+
+@media(max-width:768px){
+
+    .user-modal-card{
+        width:100%;
+    }
+
+    .user-modal-buttons{
+        flex-direction:column;
+    }
+
+    .user-detail-row{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .user-detail-row strong{
+        max-width:100%;
+        text-align:left;
+    }
+
+}
