@@ -1,317 +1,278 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaTags } from "react-icons/fa";
-import "./Categories.css"
+import {
+  FaTags,
+  FaEdit,
+  FaTrash,
+  FaSearch,
+  FaPlus,
+  FaTimes,
+  FaCheck,
+  FaLayerGroup,
+} from "react-icons/fa";
+import "./Categories.css";
+
+const API_BASE = "http://localhost:5000/api";
+const getToken = () => localStorage.getItem("pos-token");
+const headers = () => ({
+  headers: { Authorization: `Bearer ${getToken()}` },
+});
 
 const Categories = () => {
   const [categoryName, setCategoryName] = useState("");
   const [categoryDescription, setCategoryDescription] = useState("");
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [editCategory, setEditCategory] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredCategories = categories.filter(
     (category) =>
-      category.categoryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      category.categoryDescription.toLowerCase().includes(searchTerm.toLowerCase())
+      (category.categoryName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (category.categoryDescription || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
-
 
   const fetchCategories = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/api/category", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
-        },
-      });
-      console.log(response.data.categories);
-      setCategories(response.data.categories);
-      setLoading(false);
+      const response = await axios.get(`${API_BASE}/category`, headers());
+      setCategories(response.data.categories || []);
     } catch (error) {
-      // console.error("Error fetching categories:", error);
+      console.error("Error fetching categories:", error);
+    } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-
     fetchCategories();
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!categoryName.trim()) {
+      alert("Please enter a category name.");
+      return;
+    }
 
-    if (editCategory) {
-      const response = await axios.put(`http://localhost:5000/api/category/${editCategory}`,
-        {
-          categoryName,
-          categoryDescription,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
-          },
+    setSubmitting(true);
+    try {
+      if (editCategory) {
+        const response = await axios.put(
+          `${API_BASE}/category/${editCategory}`,
+          { categoryName, categoryDescription },
+          headers()
+        );
+
+        if (response.data.success) {
+          setEditCategory(null);
+          setCategoryName("");
+          setCategoryDescription("");
+          fetchCategories();
+        } else {
+          alert("Error updating category.");
         }
-      );
-
-      if (response.data.success) {
-        setEditCategory(null);
-        alert("Category Updated Successfully");
-        fetchCategories();
-        setCategoryName("");
-        setCategoryDescription("");
       } else {
-        alert("Error upateded category. please try again.");
-      }
-    } else {
-      const response = await axios.post(
-        "http://localhost:5000/api/category/add",
-        {
-          categoryName,
-          categoryDescription,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
-          },
+        const response = await axios.post(
+          `${API_BASE}/category/add`,
+          { categoryName, categoryDescription },
+          headers()
+        );
+
+        if (response.data.success) {
+          setCategoryName("");
+          setCategoryDescription("");
+          fetchCategories();
+        } else {
+          alert("Error adding category.");
         }
-      );
-
-      if (response.data.success) {
-        alert("Category added Successfully");
-        fetchCategories();
-        setCategoryName("");
-        setCategoryDescription("");
-      } else {
-        alert("Error adding category. please try again.");
       }
-
-    };
-  }
-  const handleEdit = async (category) => {
-    setEditCategory(category._id);
-    setCategoryName(category.categoryName);
-    setCategoryDescription(category.categoryDescription);
+    } catch (error) {
+      console.error("Submit Category Error:", error);
+      alert("An error occurred while saving the category.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleCancel = async () => {
+  const handleEdit = (category) => {
+    setEditCategory(category._id);
+    setCategoryName(category.categoryName);
+    setCategoryDescription(category.categoryDescription || "");
+  };
+
+  const handleCancel = () => {
     setEditCategory(null);
     setCategoryName("");
     setCategoryDescription("");
   };
 
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this category?");
-    if (confirmDelete) {
-      try {
-        const response = await axios.delete(`http://localhost:5000/api/category/${id}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
-          },
-        });
-        if (response.data.success) {
-          alert("Category deleted successfully!");
-          fetchCategories();
-        } else {
-          // console.error("Error deleting category:", data);
-          alert("Error deleting category. Please try again.");
-        }
-      } catch (error) {
-        // console.error("Error deleting category:", error);
-        alert("Error deleting category. Please try again.");
+    if (!window.confirm("Are you sure you want to delete this category?")) return;
+    try {
+      const response = await axios.delete(`${API_BASE}/category/${id}`, headers());
+      if (response.data.success) {
+        fetchCategories();
+      } else {
+        alert("Error deleting category.");
       }
+    } catch (error) {
+      console.error("Delete Category Error:", error);
+      alert("Failed to delete category.");
     }
   };
 
-  if (loading) return <div>Loading....</div>;
-
   return (
-   <div className="categories-wrapper">
-    <div className="category-left">
-
-    <div className="category-card">
-
-        <div className="category-header">
-
-            <h2>
-                {editCategory ? "Edit Category" : "Add Category"}
-            </h2>
-
-            <p>
-                Create and manage product categories
-            </p>
-
+    <div className="categories-module-root">
+      {/* ─── Header Info ────────────────────────────────────── */}
+      <div className="module-header-row">
+        <div>
+          <h2 className="module-title">Categories Management</h2>
+          <p className="module-subtitle">Organize and group catalog items for smart filtering</p>
         </div>
+        <div className="module-stats-pill">
+          <FaLayerGroup /> {categories.length} Total Groups
+        </div>
+      </div>
 
-        <form
-            onSubmit={handleSubmit}
-            className="category-form"
-        >
+      <div className="categories-grid-layout">
+        {/* ─── Left Form Card ───────────────────────────────── */}
+        <div className="category-form-card">
+          <div className="form-header-box">
+            <div className="form-header-icon">
+              <FaTags />
+            </div>
+            <div>
+              <h3>{editCategory ? "Edit Category" : "Add New Category"}</h3>
+              <p>{editCategory ? "Modify existing category details" : "Create a new catalog classification"}</p>
+            </div>
+          </div>
 
-            <label>Category Name</label>
-
-            <input
+          <form onSubmit={handleSubmit} className="category-form-body">
+            <div className="form-field-group">
+              <label>Category Name *</label>
+              <input
                 type="text"
-                className="category-input"
                 value={categoryName}
-                onChange={(e)=>setCategoryName(e.target.value)}
-                placeholder="Enter Category Name"
-            />
-
-            <label>Description</label>
-
-            <textarea
-                rows="4"
-                className="category-textarea"
-                value={categoryDescription}
-                onChange={(e)=>setCategoryDescription(e.target.value)}
-                placeholder="Enter Category Description"
-            />
-
-            <div className="button-group">
-
-                <button
-                    type="submit"
-                    className="save-btn"
-                >
-                    {editCategory ? "Update Category" : "Add Category"}
-                </button>
-
-                {editCategory && (
-
-                    <button
-                        type="button"
-                        className="delete-btn"
-                        onClick={handleCancel}
-                    >
-                        Cancel
-                    </button>
-
-                )}
-
+                onChange={(e) => setCategoryName(e.target.value)}
+                placeholder="e.g. Electronics, Footwear"
+                required
+              />
             </div>
 
-        </form>
+            <div className="form-field-group">
+              <label>Description</label>
+              <textarea
+                rows="4"
+                value={categoryDescription}
+                onChange={(e) => setCategoryDescription(e.target.value)}
+                placeholder="Brief description of items in this category..."
+              />
+            </div>
 
-    </div>
+            <div className="form-actions-group">
+              <button
+                type="submit"
+                className="category-submit-btn"
+                disabled={submitting}
+              >
+                {submitting ? "Saving..." : editCategory ? <><FaCheck /> Update Category</> : <><FaPlus /> Add Category</>}
+              </button>
 
-</div>
-<div className="category-right">
+              {editCategory && (
+                <button
+                  type="button"
+                  className="category-cancel-btn"
+                  onClick={handleCancel}
+                >
+                  <FaTimes /> Cancel
+                </button>
+              )}
+            </div>
+          </form>
+        </div>
 
-    <div className="table-header">
+        {/* ─── Right Table Card ──────────────────────────────── */}
+        <div className="category-table-card">
+          <div className="table-top-controls">
+            <div className="table-search-box">
+              <FaSearch className="table-search-icon" />
+              <input
+                type="text"
+                placeholder="Search categories..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <span className="results-count-tag">
+              {filteredCategories.length} Found
+            </span>
+          </div>
 
-        <h2>Category List</h2>
-
-        <input
-            type="text"
-            className="search-box"
-            placeholder="🔍 Search Category..."
-            value={searchTerm}
-            onChange={(e)=>setSearchTerm(e.target.value)}
-        />
-
-    </div>
-
-    <div className="table-responsive">
-
-        <table>
-
-            <thead>
-
+          <div className="table-container">
+            <table className="category-data-table">
+              <thead>
                 <tr>
-
-                    <th>ID</th>
-                    <th>Category</th>
-                    <th>Description</th>
-                    <th style={{textAlign:"center"}}>Actions</th>
-
+                  <th style={{ width: "50px" }}>#</th>
+                  <th>Category Name</th>
+                  <th>Description</th>
+                  <th style={{ textAlign: "right", width: "160px" }}>Actions</th>
                 </tr>
-
-            </thead>
-
-            <tbody>
-
-                {filteredCategories.length > 0 ? (
-
-                    filteredCategories.map((category,index)=>(
-
-                        <tr key={category._id}>
-
-                            <td>
-
-                                <div className="id-circle">
-                                    {index+1}
-                                </div>
-
-                            </td>
-
-                            <td>
-
-                                <div className="category-name">
-                                    {category.categoryName}
-                                </div>
-
-                            </td>
-
-                            <td className="category-description">
-                                {category.categoryDescription}
-                            </td>
-
-                            <td>
-
-                                <div className="category-action-buttons">
-
-                                    <button
-                                        className="edit-btn"
-                                        onClick={()=>handleEdit(category)}
-                                    >
-                                        Edit
-                                    </button>
-
-                                    <button
-                                        className="delete-btn"
-                                        onClick={()=>handleDelete(category._id)}
-                                    >
-                                        Delete
-                                    </button>
-
-                                </div>
-
-                            </td>
-
-                        </tr>
-
-                    ))
-
-                ) : (
-
-                    <tr>
-
-                        <td
-                            colSpan="4"
-                            className="empty"
-                        >
-                            No Categories Found
-                        </td>
-
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan="4" className="empty-state-cell">
+                      Loading Categories...
+                    </td>
+                  </tr>
+                ) : filteredCategories.length > 0 ? (
+                  filteredCategories.map((cat, index) => (
+                    <tr key={cat._id}>
+                      <td>
+                        <span className="row-index-badge">{index + 1}</span>
+                      </td>
+                      <td>
+                        <strong className="cat-name-highlight">{cat.categoryName}</strong>
+                      </td>
+                      <td className="cat-desc-cell">
+                        {cat.categoryDescription || "No description provided"}
+                      </td>
+                      <td>
+                        <div className="table-action-btn-row">
+                          <button
+                            className="action-btn edit-action"
+                            onClick={() => handleEdit(cat)}
+                            title="Edit Category"
+                          >
+                            <FaEdit /> Edit
+                          </button>
+                          <button
+                            className="action-btn delete-action"
+                            onClick={() => handleDelete(cat._id)}
+                            title="Delete Category"
+                          >
+                            <FaTrash /> Delete
+                          </button>
+                        </div>
+                      </td>
                     </tr>
-
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4" className="empty-state-cell">
+                      No categories found matching your query.
+                    </td>
+                  </tr>
                 )}
-
-            </tbody>
-
-        </table>
-
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
-
-</div>
-    </div>
-
-
   );
 };
 
 export default Categories;
-

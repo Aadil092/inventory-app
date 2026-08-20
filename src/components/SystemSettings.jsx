@@ -1,11 +1,35 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { FaCog, FaGlobe, FaDollarSign, FaPercent, FaPhone, FaEnvelope, FaStore, FaMapMarkerAlt, FaClock } from "react-icons/fa";
+import {
+  FaCog,
+  FaGlobe,
+  FaDollarSign,
+  FaPercent,
+  FaPhone,
+  FaEnvelope,
+  FaStore,
+  FaMapMarkerAlt,
+  FaClock,
+  FaPlus,
+  FaSearch,
+  FaEdit,
+  FaTrash,
+  FaCheck,
+  FaTimes,
+  FaSlidersH,
+} from "react-icons/fa";
 import "./SystemSettings.css";
+
+const API_BASE = "http://localhost:5000/api";
+const getToken = () => localStorage.getItem("pos-token");
+const headers = () => ({
+  headers: { Authorization: `Bearer ${getToken()}` },
+});
 
 const SystemSettings = () => {
   const [settings, setSettings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editSetting, setEditSetting] = useState(null);
@@ -18,29 +42,16 @@ const SystemSettings = () => {
     status: "active",
   });
 
-  const filteredSettings = settings.filter(
-    (setting) =>
-      setting.settingKey?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      setting.settingValue?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      setting.description?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   const fetchSettings = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/api/settings", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
-        },
-      });
+      const response = await axios.get(`${API_BASE}/settings`, headers());
       if (response.data.success) {
         setSettings(response.data.settings || []);
-        setLoading(false);
-      } else {
-        setLoading(false);
       }
     } catch (error) {
-      // console.error("Error fetching settings:", error);
+      console.error("Error fetching settings:", error);
+    } finally {
       setLoading(false);
     }
   };
@@ -83,90 +94,56 @@ const SystemSettings = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
 
-    if (editSetting) {
-      try {
+    try {
+      if (editSetting) {
         const response = await axios.put(
-          `http://localhost:5000/api/settings/${editSetting}`,
+          `${API_BASE}/settings/${editSetting}`,
           formData,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
-            },
-          }
+          headers()
         );
 
         if (response.data.success) {
-          alert("Setting Updated Successfully");
-          setEditSetting(null);
-          setFormData({
-            settingKey: "",
-            settingValue: "",
-            settingType: "text",
-            description: "",
-            status: "active",
-          });
-          setShowModal(false);
+          handleCancel();
           fetchSettings();
         } else {
-          alert("Error updating setting. Please try again.");
+          alert("Error updating setting.");
         }
-      } catch (error) {
-        // console.error("Error updating setting:", error);
-        alert("Error updating setting. Please try again.");
-      }
-    } else {
-      try {
+      } else {
         const response = await axios.post(
-          "http://localhost:5000/api/settings/add",
+          `${API_BASE}/settings/add`,
           formData,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
-            },
-          }
+          headers()
         );
 
         if (response.data.success) {
-          alert("Setting Added Successfully");
-          setFormData({
-            settingKey: "",
-            settingValue: "",
-            settingType: "text",
-            description: "",
-            status: "active",
-          });
-          setShowModal(false);
+          handleCancel();
           fetchSettings();
         } else {
-          alert("Error adding setting. Please try again.");
+          alert("Error adding setting.");
         }
-      } catch (error) {
-        // console.error("Error adding setting:", error);
-        alert("Error adding setting. Please try again.");
       }
+    } catch (error) {
+      console.error("Save setting error:", error);
+      alert("Failed to save system setting.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this setting?");
-    if (confirmDelete) {
-      try {
-        const response = await axios.delete(`http://localhost:5000/api/settings/${id}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
-          },
-        });
-        if (response.data.success) {
-          alert("Setting deleted successfully!");
-          fetchSettings();
-        } else {
-          alert("Error deleting setting. Please try again.");
-        }
-      } catch (error) {
-        // console.error("Error deleting setting:", error);
-        alert("Error deleting setting. Please try again.");
+    if (!window.confirm("Are you sure you want to delete this setting parameter?")) return;
+    try {
+      const response = await axios.delete(`${API_BASE}/settings/${id}`, headers());
+      if (response.data.success) {
+        fetchSettings();
+      } else {
+        alert("Error deleting setting.");
       }
+    } catch (error) {
+      console.error("Delete setting error:", error);
+      alert("Failed to delete setting.");
     }
   };
 
@@ -186,130 +163,242 @@ const SystemSettings = () => {
         return icon;
       }
     }
-    return <FaCog />;
+    return <FaSlidersH />;
   };
 
-  if (loading) return <div>Loading...</div>;
+  const filteredSettings = settings.filter(
+    (setting) =>
+      (setting.settingKey || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (setting.settingValue || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (setting.description || "").toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <div className="settings-container">
-      {/* Top Toolbar */}
-      <div className="settings-toolbar">
-        <input
-          type="text"
-          placeholder="Search settings..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="settings-search"
-        />
+    <div className="settings-module-root">
+      {/* ─── Header Info ────────────────────────────────────── */}
+      <div className="module-header-row">
+        <div>
+          <h2 className="module-title">System & Global Configuration</h2>
+          <p className="module-subtitle">Configure tax rates, store parameters, currency, and operational defaults</p>
+        </div>
 
         <button
-          className="add-settings-btn"
-          onClick={() => setShowModal(true)}
+          type="button"
+          className="add-settings-main-btn"
+          onClick={() => {
+            handleCancel();
+            setShowModal(true);
+          }}
         >
-          Add Setting
+          <FaPlus /> Add New Parameter
         </button>
       </div>
 
-      {/* Add / Edit Modal */}
-      {showModal && (
-        <div className="settings-modal-overlay">
-          <div className="settings-modal">
-            <button
-              className="modal-close-btn"
-              onClick={handleCancel}
-            >
-              ✕
-            </button>
+      {/* ─── Settings Table Card ────────────────────────────── */}
+      <div className="settings-table-card">
+        <div className="table-top-controls">
+          <div className="table-search-box">
+            <FaSearch className="table-search-icon" />
+            <input
+              type="text"
+              placeholder="Search setting key, value, or description..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <span className="results-count-tag">{filteredSettings.length} Parameters</span>
+        </div>
 
-            <h2 className="modal-title">
-              {editSetting ? "Edit Setting" : "Add Setting"}
-            </h2>
+        <div className="table-container">
+          <table className="settings-data-table">
+            <thead>
+              <tr>
+                <th style={{ width: "50px" }}>#</th>
+                <th>Configuration Key</th>
+                <th>Active Value</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th style={{ textAlign: "right", width: "160px" }}>Actions</th>
+              </tr>
+            </thead>
 
-            <form
-              className="settings-form"
-              onSubmit={handleSubmit}
-            >
-              <label className="form-label">Setting Key</label>
-              <input
-                className="settings-form-input"
-                type="text"
-                name="settingKey"
-                placeholder="e.g. store_name, tax_rate, currency"
-                value={formData.settingKey}
-                onChange={handleChange}
-                required
-              />
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan="7" className="empty-state-cell">
+                    Loading System Configurations...
+                  </td>
+                </tr>
+              ) : filteredSettings.length > 0 ? (
+                filteredSettings.map((st, index) => (
+                  <tr key={st._id || index}>
+                    <td>
+                      <span className="row-index-badge">{index + 1}</span>
+                    </td>
 
-              <label className="form-label">Setting Value</label>
-              {formData.settingType === "textarea" ? (
-                <textarea
-                  className="settings-form-textarea"
-                  name="settingValue"
-                  placeholder="Enter setting value"
-                  value={formData.settingValue}
-                  onChange={handleChange}
-                  required
-                />
+                    <td>
+                      <div className="setting-key-cell">
+                        <div className="setting-key-icon">
+                          {getSettingIcon(st.settingKey)}
+                        </div>
+                        <strong className="setting-key-name">
+                          {st.settingKey?.replace(/_/g, " ")}
+                        </strong>
+                      </div>
+                    </td>
+
+                    <td>
+                      <span className="setting-val-tag">
+                        {st.settingValue}
+                      </span>
+                    </td>
+
+                    <td>
+                      <span className="type-pill">
+                        {st.settingType || "text"}
+                      </span>
+                    </td>
+
+                    <td className="setting-desc-text">
+                      {st.description || "—"}
+                    </td>
+
+                    <td>
+                      <span
+                        className={`status-pill ${
+                          st.status === "active" ? "active" : "inactive"
+                        }`}
+                      >
+                        {st.status === "active" ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+
+                    <td>
+                      <div className="table-action-btn-row">
+                        <button
+                          className="action-btn edit-action"
+                          onClick={() => handleEdit(st)}
+                          title="Edit Parameter"
+                        >
+                          <FaEdit /> Edit
+                        </button>
+                        <button
+                          className="action-btn delete-action"
+                          onClick={() => handleDelete(st._id)}
+                          title="Delete Parameter"
+                        >
+                          <FaTrash /> Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
               ) : (
+                <tr>
+                  <td colSpan="7" className="empty-state-cell">
+                    No configuration parameters found matching your search.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* ─── Add / Edit Modal ───────────────────────────────── */}
+      {showModal && (
+        <div className="settings-modal-overlay" onClick={handleCancel}>
+          <div className="settings-modal-box" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header-line">
+              <div className="modal-heading">
+                <FaCog className="modal-header-icon blue" />
+                <h3>{editSetting ? "Edit System Parameter" : "Add System Parameter"}</h3>
+              </div>
+              <button className="modal-close-x" onClick={handleCancel}>✕</button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="settings-modal-form">
+              <div className="form-field-group">
+                <label>Setting Key *</label>
                 <input
-                  className="settings-form-input"
-                  type={formData.settingType === "number" ? "number" : "text"}
-                  name="settingValue"
-                  placeholder="Enter setting value"
-                  value={formData.settingValue}
+                  type="text"
+                  name="settingKey"
+                  placeholder="e.g. tax_rate, default_currency, store_address"
+                  value={formData.settingKey}
                   onChange={handleChange}
                   required
                 />
-              )}
+              </div>
 
-              <label className="form-label">Setting Type</label>
-              <select
-                className="settings-form-select"
-                name="settingType"
-                value={formData.settingType}
-                onChange={handleChange}
-              >
-                <option value="text">Text</option>
-                <option value="number">Number</option>
-                <option value="textarea">Textarea</option>
-                <option value="email">Email</option>
-                <option value="url">URL</option>
-              </select>
+              <div className="form-field-group">
+                <label>Setting Value *</label>
+                {formData.settingType === "textarea" ? (
+                  <textarea
+                    rows="3"
+                    name="settingValue"
+                    placeholder="Enter configuration value"
+                    value={formData.settingValue}
+                    onChange={handleChange}
+                    required
+                  />
+                ) : (
+                  <input
+                    type={formData.settingType === "number" ? "number" : "text"}
+                    name="settingValue"
+                    placeholder="Enter value"
+                    value={formData.settingValue}
+                    onChange={handleChange}
+                    required
+                  />
+                )}
+              </div>
 
-              <label className="form-label">Description</label>
-              <textarea
-                className="settings-form-textarea"
-                name="description"
-                placeholder="Brief description of this setting"
-                value={formData.description}
-                onChange={handleChange}
-              />
+              <div className="modal-form-grid">
+                <div className="form-field-group">
+                  <label>Data Type</label>
+                  <select
+                    name="settingType"
+                    value={formData.settingType}
+                    onChange={handleChange}
+                  >
+                    <option value="text">Text / String</option>
+                    <option value="number">Number / Percentage</option>
+                    <option value="textarea">Multiline Text</option>
+                    <option value="email">Email</option>
+                    <option value="url">URL</option>
+                  </select>
+                </div>
 
-              <label className="form-label">Status</label>
-              <select
-                className="settings-form-select"
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
-              >
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
+                <div className="form-field-group">
+                  <label>Status</label>
+                  <select
+                    name="status"
+                    value={formData.status}
+                    onChange={handleChange}
+                  >
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
 
-              <div className="settings-button-group">
-                <button
-                  className="save-btn"
-                  type="submit"
-                >
-                  {editSetting ? "Save Changes" : "Add Setting"}
+              <div className="form-field-group">
+                <label>Description (Optional)</label>
+                <textarea
+                  rows="2"
+                  name="description"
+                  placeholder="Short note explaining this parameter's effect..."
+                  value={formData.description}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="modal-actions-row">
+                <button type="submit" className="modal-primary-btn" disabled={submitting}>
+                  {submitting ? "Saving..." : editSetting ? <><FaCheck /> Save Parameter</> : <><FaPlus /> Add Parameter</>}
                 </button>
-
-                <button
-                  className="cancel-btn"
-                  type="button"
-                  onClick={handleCancel}
-                >
+                <button type="button" className="modal-secondary-btn" onClick={handleCancel}>
                   Cancel
                 </button>
               </div>
@@ -317,88 +406,8 @@ const SystemSettings = () => {
           </div>
         </div>
       )}
-
-      {/* Settings Table */}
-      <div className="settings-table-card">
-        <table className="settings-table">
-          <thead>
-            <tr>
-              <th>Setting Key</th>
-              <th>Value</th>
-              <th>Type</th>
-              <th>Description</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredSettings.length > 0 ? (
-              filteredSettings.map((setting, index) => (
-                <tr key={setting._id || index}>
-                  <td>
-                    <div className="setting-info">
-                      <div className="setting-key-icon">
-                        {getSettingIcon(setting.settingKey)}
-                      </div>
-                      <div className="setting-key">
-                        {setting.settingKey?.replace(/_/g, " ")}
-                      </div>
-                    </div>
-                  </td>
-
-                  <td>
-                    <div className="setting-value">
-                      {setting.settingValue}
-                    </div>
-                  </td>
-
-                  <td>
-                    <span className="type-badge">
-                      {setting.settingType || "text"}
-                    </span>
-                  </td>
-
-                  <td className="setting-value-text">
-                    {setting.description || "—"}
-                  </td>
-
-                  <td>
-                    <span className={`status-badge ${setting.status === "active" ? "status-active" : "status-inactive"}`}>
-                      {setting.status === "active" ? "Active" : "Inactive"}
-                    </span>
-                  </td>
-
-                  <td>
-                    <div className="settings-actions">
-                      <button
-                        className="edit-btn"
-                        onClick={() => handleEdit(setting)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="delete-btn"
-                        onClick={() => handleDelete(setting._id)}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="6" className="settings-empty">
-                  No Settings Found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
     </div>
   );
 };
 
 export default SystemSettings;
-

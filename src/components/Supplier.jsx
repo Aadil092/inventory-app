@@ -1,19 +1,37 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
+import axios from "axios";
+import {
+  FaTruck,
+  FaPlus,
+  FaSearch,
+  FaEdit,
+  FaTrash,
+  FaEnvelope,
+  FaPhone,
+  FaMapMarkerAlt,
+  FaBuilding,
+  FaTimes,
+  FaCheck,
+} from "react-icons/fa";
 import State from "../components/State";
 import City from "../components/City";
-import "./Supplier.css"
+import "./Supplier.css";
+
+const API_BASE = "http://localhost:5000/api";
+const getToken = () => localStorage.getItem("pos-token");
+const headers = () => ({
+  headers: { Authorization: `Bearer ${getToken()}` },
+});
 
 const Supplier = () => {
-  const [addEditModel, setAddEditModel] = useState(null);
+  const [addEditModel, setAddEditModel] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [editSupplier, setEditSupplier] = useState(null);
   const [suppliers, setSuppliers] = useState([]);
-
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
-
 
   const [formdata, setFormData] = useState({
     name: "",
@@ -24,65 +42,48 @@ const Supplier = () => {
     cityId: "",
   });
 
-  const filtereSupplier = suppliers.filter(
-    (supplier) =>
-      supplier.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      supplier.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      supplier.number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      supplier.address?.toLowerCase().includes(searchTerm.toLowerCase())
-
-  );
-
-
   const fetchSupplier = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/api/supplier", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
-        },
-      });
+      const response = await axios.get(`${API_BASE}/supplier`, headers());
       if (response.data.success) {
         setSuppliers(response.data.suppliers || []);
         setStates(response.data.states || []);
         setCities(response.data.cities || []);
-        setLoading(false);
       }
     } catch (error) {
-      // console.error("Error fetching categories:", error);
+      console.error("Error fetching suppliers:", error);
+    } finally {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchSupplier();
   }, []);
 
-
-
-
-  const handlerChange = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-  }
-  const handleEdit = async (supplier) => {
-    setEditSupplier(supplier._id);
-    setFormData({
-      name: supplier.name,
-      email: supplier.email,
-      number: supplier.number,
-      address: supplier.address,
-      stateId: supplier.stateId,
-      cityId: supplier.cityId,
-    });
-
-    setAddEditModel(true);
-
   };
 
-  const handleCancel = async () => {
+  const handleEdit = (supplier) => {
+    setEditSupplier(supplier._id);
+    setFormData({
+      name: supplier.name || "",
+      email: supplier.email || "",
+      number: supplier.number || "",
+      address: supplier.address || "",
+      stateId: supplier.stateId?._id || supplier.stateId || "",
+      cityId: supplier.cityId?._id || supplier.cityId || "",
+    });
+    setAddEditModel(true);
+  };
+
+  const handleCancel = () => {
     setEditSupplier(null);
     setFormData({
       name: "",
@@ -92,361 +93,310 @@ const Supplier = () => {
       stateId: "",
       cityId: "",
     });
-
     setAddEditModel(false);
-
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editSupplier) {
-      const response = await axios.put(`http://localhost:5000/api/supplier/${editSupplier}`,
-        formdata,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
-          },
-        }
-      );
+    setSubmitting(true);
 
-      if (response.data.success) {
-        setEditSupplier(null);
-        alert("Supplier Updated Successfully");
-        fetchSupplier();
-        setFormData({
-          name: "",
-          email: "",
-          number: "",
-          address: "",
-          stateId: "",
-          cityId: "",
-        })
-        setAddEditModel(false);
-      } else {
-        alert("Error upateded suppliers. please try again.");
-      }
-    } else {
-      const response = await axios.post("http://localhost:5000/api/supplier/add",
-        formdata,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
-          },
-        }
-      );
+    try {
+      if (editSupplier) {
+        const response = await axios.put(
+          `${API_BASE}/supplier/${editSupplier}`,
+          formdata,
+          headers()
+        );
 
-      if (response.data.success) {
-        alert("Supplier added Successfully");
-        fetchSupplier();
-        setFormData({
-          name: "",
-          email: "",
-          number: "",
-          address: "",
-          stateId: "",
-          cityId: "",
-        });
-
-        setAddEditModel(null);
-      } else {
-        alert("Error adding supplier. please try again.");
-      }
-    }
-  }
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this supplier?");
-    if (confirmDelete) {
-      try {
-        const response = await axios.delete(`http://localhost:5000/api/supplier/${id}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
-          },
-        });
         if (response.data.success) {
-          alert("Supplier deleted successfully!");
+          handleCancel();
           fetchSupplier();
         } else {
-          // console.error("Error deleting category:", data);
-          alert("Error deleting supplier. Please try again.");
+          alert("Error updating supplier.");
         }
-      } catch (error) {
-        // console.error("Error deleting category:", error);
-        alert("Error deleting supplier. Please try again.");
+      } else {
+        const response = await axios.post(
+          `${API_BASE}/supplier/add`,
+          formdata,
+          headers()
+        );
+
+        if (response.data.success) {
+          handleCancel();
+          fetchSupplier();
+        } else {
+          alert("Error adding supplier.");
+        }
       }
+    } catch (error) {
+      console.error("Submit Supplier Error:", error);
+      alert("Failed to save supplier.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  if (loading) return <div>Loading....</div>;
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this supplier?")) return;
+    try {
+      const response = await axios.delete(`${API_BASE}/supplier/${id}`, headers());
+      if (response.data.success) {
+        fetchSupplier();
+      } else {
+        alert("Error deleting supplier.");
+      }
+    } catch (error) {
+      console.error("Delete supplier error:", error);
+      alert("Failed to delete supplier.");
+    }
+  };
+
+  const filteredSuppliers = suppliers.filter(
+    (s) =>
+      (s.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (s.email || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (s.number || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (s.address || "").toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-  
-    <div className="supplier-page">
+    <div className="supplier-module-root">
+      {/* ─── Header Row ─────────────────────────────────────── */}
+      <div className="module-header-row">
+        <div>
+          <h2 className="module-title">Supplier Management</h2>
+          <p className="module-subtitle">Manage wholesale supply vendors, contact channels, and locations</p>
+        </div>
 
-      {/* Top Toolbar */}
-      <div className="supplier-toolbar">
-
-        <input
-          type="text"
-          placeholder="Search supplier..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="supplier-search"
-        />
-
-        <button
-          className="add-supplier-btn"
-          onClick={() => setAddEditModel(true)}
-        >
-          Add Supplier
-        </button>
-
-        <State />
-        <City />
-
+        <div className="supplier-header-btn-group">
+          <button
+            className="add-supplier-main-btn"
+            onClick={() => {
+              handleCancel();
+              setAddEditModel(true);
+            }}
+          >
+            <FaPlus /> Add Supplier
+          </button>
+          <State />
+          <City />
+        </div>
       </div>
 
-      {/* Add / Edit Modal */}
+      {/* ─── Table Card ─────────────────────────────────────── */}
+      <div className="supplier-table-card">
+        <div className="table-top-controls">
+          <div className="table-search-box">
+            <FaSearch className="table-search-icon" />
+            <input
+              type="text"
+              placeholder="Search by supplier name, phone, or email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <span className="results-count-tag">{filteredSuppliers.length} Suppliers</span>
+        </div>
+
+        <div className="table-container">
+          <table className="supplier-data-table">
+            <thead>
+              <tr>
+                <th style={{ width: "50px" }}>#</th>
+                <th>Supplier Details</th>
+                <th>Contact Info</th>
+                <th>Address</th>
+                <th>Region</th>
+                <th style={{ textAlign: "right", width: "160px" }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan="6" className="empty-state-cell">
+                    Loading Suppliers...
+                  </td>
+                </tr>
+              ) : filteredSuppliers.length > 0 ? (
+                filteredSuppliers.map((sup, index) => (
+                  <tr key={sup._id}>
+                    <td>
+                      <span className="row-index-badge">{index + 1}</span>
+                    </td>
+                    <td>
+                      <div className="supplier-avatar-cell">
+                        <div className="sup-avatar-badge">
+                          {sup.name?.charAt(0).toUpperCase() || "S"}
+                        </div>
+                        <div>
+                          <strong className="sup-name">{sup.name}</strong>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="sup-contact-group">
+                        <span className="contact-line">
+                          <FaEnvelope className="sub-icon" /> {sup.email || "No email"}
+                        </span>
+                        <span className="contact-line">
+                          <FaPhone className="sub-icon" /> {sup.number || "No phone"}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="sup-address-cell">{sup.address || "N/A"}</td>
+                    <td>
+                      <div className="region-tags-wrap">
+                        {sup.stateId?.stateName && (
+                          <span className="state-badge-pill">{sup.stateId.stateName}</span>
+                        )}
+                        {sup.cityId?.name && (
+                          <span className="city-badge-pill">{sup.cityId.name}</span>
+                        )}
+                      </div>
+                    </td>
+                    <td>
+                      <div className="table-action-btn-row">
+                        <button
+                          className="action-btn edit-action"
+                          onClick={() => handleEdit(sup)}
+                          title="Edit Supplier"
+                        >
+                          <FaEdit /> Edit
+                        </button>
+                        <button
+                          className="action-btn delete-action"
+                          onClick={() => handleDelete(sup._id)}
+                          title="Delete Supplier"
+                        >
+                          <FaTrash /> Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" className="empty-state-cell">
+                    No suppliers found matching your query.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* ─── Add / Edit Modal ───────────────────────────────── */}
       {addEditModel && (
-        <div className="supplier-modal">
-          <div className="supplier-modal-card">
+        <div className="supplier-modal-overlay" onClick={handleCancel}>
+          <div className="supplier-modal-box" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header-line">
+              <div className="modal-heading">
+                <FaTruck className="modal-header-icon blue" />
+                <h3>{editSupplier ? "Edit Supplier" : "Add New Supplier"}</h3>
+              </div>
+              <button className="modal-close-x" onClick={handleCancel}>✕</button>
+            </div>
 
-            <button
-              className="modal-close"
-              onClick={handleCancel}
-            >
-              ✕
-            </button>
+            <form onSubmit={handleSubmit} className="supplier-modal-form">
+              <div className="modal-form-grid">
+                <div className="form-field-group">
+                  <label>Supplier / Vendor Name *</label>
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="e.g. Apex Global Logistics"
+                    value={formdata.name}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
 
-            <h2 className="supplier-modal-title">
-              {editSupplier ? "Edit Supplier" : "Add Supplier"}
-            </h2>
+                <div className="form-field-group">
+                  <label>Email Address</label>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="contact@supplier.com"
+                    value={formdata.email}
+                    onChange={handleChange}
+                  />
+                </div>
 
-            <form
-              className="supplier-form"
-              onSubmit={handleSubmit}
-            >
+                <div className="form-field-group">
+                  <label>Phone Number</label>
+                  <input
+                    type="text"
+                    name="number"
+                    placeholder="+1 (555) 000-0000"
+                    value={formdata.number}
+                    onChange={handleChange}
+                  />
+                </div>
 
-              <input
-                className="supplier-input"
-                type="text"
-                name="name"
-                placeholder="Supplier Name"
-                value={formdata.name}
-                onChange={handlerChange}
-              />
+                <div className="form-field-group">
+                  <label>Street Address</label>
+                  <input
+                    type="text"
+                    name="address"
+                    placeholder="Warehouse 4, Industrial Blvd"
+                    value={formdata.address}
+                    onChange={handleChange}
+                  />
+                </div>
 
-              <input
-                className="supplier-input"
-                type="email"
-                name="email"
-                placeholder="Supplier Email"
-                value={formdata.email}
-                onChange={handlerChange}
-              />
-
-              <input
-                className="supplier-input"
-                type="text"
-                name="number"
-                placeholder="Phone Number"
-                value={formdata.number}
-                onChange={handlerChange}
-              />
-
-              <input
-                className="supplier-input"
-                type="text"
-                name="address"
-                placeholder="Supplier Address"
-                value={formdata.address}
-                onChange={handlerChange}
-              />
-
-              <select
-                className="supplier-input"
-                name="stateId"
-                value={formdata.stateId}
-                onChange={handlerChange}
-              >
-                <option value="">Select State</option>
-
-                {states.map((state) => (
-                  <option
-                    key={state._id}
-                    value={state._id}
+                <div className="form-field-group">
+                  <label>State / Region</label>
+                  <select
+                    name="stateId"
+                    value={formdata.stateId}
+                    onChange={handleChange}
                   >
-                    {state.stateName}
-                  </option>
-                ))}
-              </select>
-               <select
-                className="supplier-input"
-                name="cityId"
-                value={formdata.cityId}
-                onChange={handlerChange}
-                
-              >
-                <option value="">Select City</option>
-                {cities
-                  .filter((city) => {
-                    const cid = city.stateId?._id || city.stateId?.id || city.stateId;
-                    return cid === formdata.stateId;
-                  })
-                  .map((city) => (
-                    <option key={city._id || city.id} value={city._id || city.id}>
-                      {city.cityName || city.name}
-                    </option>
-                  ))}
+                    <option value="">Select State</option>
+                    {states.map((st) => (
+                      <option key={st._id} value={st._id}>
+                        {st.stateName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              </select>
+                <div className="form-field-group">
+                  <label>City</label>
+                  <select
+                    name="cityId"
+                    value={formdata.cityId}
+                    onChange={handleChange}
+                  >
+                    <option value="">Select City</option>
+                    {cities
+                      .filter((c) => {
+                        const sid = c.stateId?._id || c.stateId?.id || c.stateId;
+                        return sid === formdata.stateId;
+                      })
+                      .map((c) => (
+                        <option key={c._id || c.id} value={c._id || c.id}>
+                          {c.cityName || c.name}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+              </div>
 
-             
-
-              <button
-                className="save-btn"
-                type="submit"
-              >
-                {editSupplier ? "Save Changes" : "Add Supplier"}
-              </button>
-
-              {editSupplier && (
-
-                <button
-                  className="cancel-btn"
-                  type="button"
-                  onClick={handleCancel}
-                >
+              <div className="modal-actions-row">
+                <button type="submit" className="modal-primary-btn" disabled={submitting}>
+                  {submitting ? "Saving..." : editSupplier ? <><FaCheck /> Save Changes</> : <><FaPlus /> Add Supplier</>}
+                </button>
+                <button type="button" className="modal-secondary-btn" onClick={handleCancel}>
                   Cancel
                 </button>
-
-              )}
-
+              </div>
             </form>
-
-
           </div>
         </div>
       )}
-
-      {/* Supplier Table */}
-      <div className="supplier-table-card">
-
-        <table className="supplier-table">
-
-          <thead className="supplier-table-head">
-            <tr>
-              {[
-                "ID",
-                "Supplier",
-                "Email",
-                "Phone",
-                "Address",
-                "State",
-                "City",
-                "Actions",
-              ].map((item) => (
-                <th key={item}>
-                  {item}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {filtereSupplier.length > 0 ? (
-              filtereSupplier.map((supplier, index) => (
-                <tr key={supplier._id} className="supplier-row">
-
-                  {/* ID */}
-                  <td className="supplier-id">
-                    {index + 1}
-                  </td>
-
-                  {/* Supplier */}
-                  <td>
-                    <div className="supplier-info">
-
-                      <div className="supplier-avatar">
-                        {supplier.name.charAt(0).toUpperCase()}
-                      </div>
-
-                      <div>
-                        <div className="supplier-name">
-                          {supplier.name}
-                        </div>
-                      </div>
-
-                    </div>
-                  </td>
-
-                  {/* Email */}
-                  <td className="supplier-email">
-                    {supplier.email}
-                  </td>
-
-                  {/* Phone */}
-                  <td className="supplier-phone">
-                    {supplier.number}
-                  </td>
-
-                  {/* Address */}
-                  <td className="supplier-address">
-                    {supplier.address}
-                  </td>
-
-                  {/* State */}
-                  <td>
-                    <span className="state-badge">
-                      {supplier.stateId?.stateName}
-                    </span>
-                  </td>
-
-                  {/* City */}
-                  <td>
-                    <span className="city-badge">
-                      {supplier.cityId?.name}
-                    </span>
-                  </td>
-
-                  {/* Actions */}
-                  <td>
-                    <div className="supplier-actions">
-
-                      <button
-                        className="edit-btn"
-                        onClick={() => handleEdit(supplier)}
-                      >
-                        Edit
-                      </button>
-
-                      <button
-                        className="delete-btn"
-                        onClick={() => handleDelete(supplier._id)}
-                      >
-                        Delete
-                      </button>
-
-                    </div>
-                  </td>
-
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="8" className="supplier-empty">
-                  No Supplier Found
-                </td>
-              </tr>
-            )}
-          </tbody>
-
-        </table>
-
-      </div>
-
     </div>
-
   );
 };
-
 
 export default Supplier;

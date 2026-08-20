@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import "./Dashboard.css"
 import {
   FaBox,
   FaShoppingCart,
@@ -15,10 +14,11 @@ import {
   FaCheckCircle,
   FaChartPie,
   FaLayerGroup,
-  FaStore,
-  FaHandshake,
   FaDollarSign,
-  FaExchangeAlt,
+  FaSyncAlt,
+  FaMoneyBillWave,
+  FaCreditCard,
+  FaBoxes,
 } from "react-icons/fa";
 import "./Dashboard.css";
 
@@ -29,26 +29,27 @@ const headers = () => ({
 });
 
 // ─── SVG Circular Progress Component ─────────────────────────
-const CircularProgress = ({ percentage, color, label, sublabel, icon }) => {
-  const radius = 50;
+const CircularProgress = ({ percentage, color, label, sublabel }) => {
+  const radius = 46;
   const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (percentage / 100) * circumference;
+  const safePercent = Math.min(100, Math.max(0, percentage || 0));
+  const offset = circumference - (safePercent / 100) * circumference;
 
   return (
     <div className="circular-progress-item">
       <div className="circular-progress-ring">
-        <svg viewBox="0 0 120 120">
-          <circle className="bg-circle" cx="60" cy="60" r={radius} />
+        <svg viewBox="0 0 110 110">
+          <circle className="bg-circle" cx="55" cy="55" r={radius} />
           <circle
             className={`progress-circle ${color}`}
-            cx="60"
-            cy="60"
+            cx="55"
+            cy="55"
             r={radius}
             strokeDasharray={circumference}
             strokeDashoffset={offset}
           />
         </svg>
-        <div className="center-text">{Math.round(percentage)}%</div>
+        <div className="center-text">{Math.round(safePercent)}%</div>
       </div>
       <div className="progress-label">{label}</div>
       {sublabel && <div className="progress-sub">{sublabel}</div>}
@@ -56,9 +57,9 @@ const CircularProgress = ({ percentage, color, label, sublabel, icon }) => {
   );
 };
 
-// ─── Main Dashboard Component ────────────────────────────────
 const Dashboard = () => {
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [stats, setStats] = useState({
     products: 0,
@@ -67,6 +68,7 @@ const Dashboard = () => {
     categories: 0,
     suppliers: 0,
     lowStock: 0,
+    lowStockItems: [],
     totalStock: 0,
     cashOrders: 0,
     onlineOrders: 0,
@@ -75,27 +77,29 @@ const Dashboard = () => {
   });
 
   // ─── Fetch all data ────────────────────────────────────────
-  const fetchAllData = useCallback(async () => {
-    setLoading(true);
+  const fetchAllData = useCallback(async (isManual = false) => {
+    if (isManual) setRefreshing(true);
+    else setLoading(true);
     setError(null);
+
     try {
-const [productsRes, ordersRes, usersRes, categoriesRes, suppliersRes] =
+      const [productsRes, ordersRes, usersRes, categoriesRes, suppliersRes] =
         await Promise.all([
-          axios.get(`${API_BASE}/products`, headers()).catch(function() {
-            return { data: { products: [], suppliers: [], categories: [] } };
-          }),
-          axios.get(`${API_BASE}/orders/all`, headers()).catch(function() {
-            return { data: { success: true, data: [] } };
-          }),
-          axios.get(`${API_BASE}/users`, headers()).catch(function() {
-            return { data: { users: [] } };
-          }),
-          axios.get(`${API_BASE}/category`, headers()).catch(function() {
-            return { data: { categories: [] } };
-          }),
-          axios.get(`${API_BASE}/supplier`, headers()).catch(function() {
-            return { data: { suppliers: [] } };
-          }),
+          axios.get(`${API_BASE}/products`, headers()).catch(() => ({
+            data: { products: [], suppliers: [], categories: [] },
+          })),
+          axios.get(`${API_BASE}/orders/all`, headers()).catch(() => ({
+            data: { success: true, data: [] },
+          })),
+          axios.get(`${API_BASE}/users`, headers()).catch(() => ({
+            data: { users: [] },
+          })),
+          axios.get(`${API_BASE}/category`, headers()).catch(() => ({
+            data: { categories: [] },
+          })),
+          axios.get(`${API_BASE}/supplier`, headers()).catch(() => ({
+            data: { suppliers: [] },
+          })),
         ]);
 
       const products = productsRes.data.products || [];
@@ -105,15 +109,19 @@ const [productsRes, ordersRes, usersRes, categoriesRes, suppliersRes] =
       const suppliers = suppliersRes.data.suppliers || [];
 
       // Compute derived stats
-      const lowStockItems = products.filter(
+      const lowStockList = products.filter(
         (p) => p.stock !== undefined && Number(p.stock) < 5
       );
       const totalStock = products.reduce(
         (sum, p) => sum + (Number(p.stock) || 0),
         0
       );
-      const cashOrders = orders.filter((o) => o.paymentId === "Cash").length;
-      const onlineOrders = orders.filter((o) => o.paymentId !== "Cash").length;
+      const cashOrders = orders.filter(
+        (o) => (o.paymentId || "").toLowerCase() === "cash"
+      ).length;
+      const onlineOrders = orders.filter(
+        (o) => (o.paymentId || "").toLowerCase() !== "cash"
+      ).length;
       const totalRevenue = orders.reduce(
         (sum, o) => sum + (Number(o.price) || 0),
         0
@@ -130,7 +138,8 @@ const [productsRes, ordersRes, usersRes, categoriesRes, suppliersRes] =
         users: users.length,
         categories: categories.length,
         suppliers: suppliers.length,
-        lowStock: lowStockItems.length,
+        lowStock: lowStockList.length,
+        lowStockItems: lowStockList.slice(0, 4),
         totalStock,
         cashOrders,
         onlineOrders,
@@ -139,289 +148,369 @@ const [productsRes, ordersRes, usersRes, categoriesRes, suppliersRes] =
       });
     } catch (err) {
       console.error("Dashboard fetch error:", err);
-      setError("Failed to load dashboard data. Please try again.");
+      setError("Failed to load dashboard data. Please check network connection.");
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, []);
 
   useEffect(() => {
     fetchAllData();
-    // Auto-refresh every 30 seconds
-    const interval = setInterval(fetchAllData, 30000);
+    const interval = setInterval(() => fetchAllData(false), 30000);
     return () => clearInterval(interval);
   }, [fetchAllData]);
 
   // ─── Derived percentages ───────────────────────────────────
   const stockHealth =
     stats.totalStock > 0
-      ? ((stats.totalStock - stats.lowStock) / stats.totalStock) * 100
-      : 0;
+      ? Math.max(0, ((stats.totalStock - stats.lowStock) / stats.totalStock) * 100)
+      : 100;
   const orderFulfillment =
     stats.orders > 0
-      ? ((stats.cashOrders + stats.onlineOrders) / (stats.orders || 1)) * 100
-      : 0;
+      ? ((stats.cashOrders + stats.onlineOrders) / stats.orders) * 100
+      : 100;
   const supplierActivity =
-    stats.suppliers > 0
-      ? Math.min(100, (stats.suppliers / (stats.suppliers + 2)) * 100)
-      : 0;
+    stats.suppliers > 0 ? Math.min(100, stats.suppliers * 20) : 0;
   const categoryCoverage =
-    stats.categories > 0
-      ? Math.min(100, (stats.categories / 10) * 100)
-      : 0;
+    stats.categories > 0 ? Math.min(100, stats.categories * 15) : 0;
 
-  // ─── Loading State ─────────────────────────────────────────
-  if (loading) {
+  if (loading && !refreshing) {
     return (
-      <div className="dashboard-container">
-        <div className="dashboard-loading">
-          <div className="spinner" />
-          <span>Loading Dashboard...</span>
-        </div>
+      <div className="dash-loading-wrapper">
+        <div className="dash-spinner" />
+        <span>Loading Real-Time Analytics...</span>
       </div>
     );
   }
 
-  // ─── Error State ───────────────────────────────────────────
   if (error) {
     return (
-      <div className="dashboard-container">
-        <div className="dashboard-error">
-          <FaExclamationTriangle />
-          <span>{error}</span>
+      <div className="dash-error-wrapper">
+        <FaExclamationTriangle className="dash-err-icon" />
+        <p>{error}</p>
+        <button className="dash-retry-btn" onClick={() => fetchAllData(true)}>
+          <FaSyncAlt /> Retry Connection
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="dashboard-root">
+      {/* ─── Header & Quick Control ─────────────────────────── */}
+      <div className="dash-header-row">
+        <div>
+          <h2 className="dash-title">Operations & Analytics</h2>
+          <p className="dash-subtitle">
+            Real-time overview of inventory stock, customer orders, and revenue
+          </p>
+        </div>
+        <div className="dash-header-actions">
+          <div className="sync-badge">
+            <span className="sync-dot"></span> Auto-Sync: 30s
+          </div>
           <button
-            onClick={fetchAllData}
-            style={{
-              marginTop: 15,
-              padding: "10px 24px",
-              background: "#2563EB",
-              color: "#fff",
-              border: "none",
-              borderRadius: 10,
-              cursor: "pointer",
-              fontWeight: 600,
-            }}
+            className={`refresh-action-btn ${refreshing ? "spinning" : ""}`}
+            onClick={() => fetchAllData(true)}
+            title="Refresh Data"
           >
-            Retry
+            <FaSyncAlt /> {refreshing ? "Syncing..." : "Sync Now"}
           </button>
         </div>
       </div>
-    );
-  }
 
-  // ─── Stat Card Config ──────────────────────────────────────
-  const statCards = [
-    {
-      label: "Total Products",
-      value: stats.products,
-      icon: <FaBox />,
-      color: "blue",
-      trend: `${stats.lowStock} low stock`,
-      trendDir: "down",
-    },
-    {
-      label: "Total Orders",
-      value: stats.orders,
-      icon: <FaShoppingCart />,
-      color: "green",
-      trend: `₹${stats.totalRevenue.toLocaleString()}`,
-      trendDir: "up",
-    },
-    {
-      label: "Total Users",
-      value: stats.users,
-      icon: <FaUsers />,
-      color: "purple",
-      trend: "Active accounts",
-      trendDir: "up",
-    },
-    {
-      label: "Categories",
-      value: stats.categories,
-      icon: <FaTags />,
-      color: "orange",
-      trend: "Product groups",
-      trendDir: "up",
-    },
-    {
-      label: "Suppliers",
-      value: stats.suppliers,
-      icon: <FaTruck />,
-      color: "pink",
-      trend: "Active partners",
-      trendDir: "up",
-    },
-    {
-      label: "Low Stock Items",
-      value: stats.lowStock,
-      icon: <FaExclamationTriangle />,
-      color: "red",
-      trend: "Needs attention",
-      trendDir: "down",
-    },
-  ];
-
-  // ─── Architecture Items ────────────────────────────────────
-  const architectureItems = [
-    { name: "Categories", count: stats.categories, icon: <FaLayerGroup />, color: "blue" },
-    { name: "Products", count: stats.products, icon: <FaBox />, color: "green" },
-    { name: "Suppliers", count: stats.suppliers, icon: <FaTruck />, color: "purple" },
-    { name: "Orders", count: stats.orders, icon: <FaClipboardList />, color: "orange" },
-    { name: "Users", count: stats.users, icon: <FaUsers />, color: "pink" },
-    { name: "Revenue", count: `₹${stats.totalRevenue.toLocaleString()}`, icon: <FaDollarSign />, color: "teal" },
-  ];
-
-  // ─── Bottom Progress Stats ─────────────────────────────────
-  const bottomStats = [
-    {
-      label: "Stock Health",
-      value: `${Math.round(stockHealth)}%`,
-      percent: Math.round(stockHealth),
-      color: "blue",
-    },
-    {
-      label: "Order Fulfillment",
-      value: `${Math.round(orderFulfillment)}%`,
-      percent: Math.round(orderFulfillment),
-      color: "green",
-    },
-    {
-      label: "Supplier Activity",
-      value: `${Math.round(supplierActivity)}%`,
-      percent: Math.round(supplierActivity),
-      color: "purple",
-    },
-    {
-      label: "Category Coverage",
-      value: `${Math.round(categoryCoverage)}%`,
-      percent: Math.round(categoryCoverage),
-      color: "orange",
-    },
-  ];
-
-  return (
-    <div className="dashboard-container">
-      {/* ─── Stats Cards ──────────────────────────────────── */}
-      <div className="stats-grid">
-        {statCards.map((card, idx) => (
-          <div className="stat-card" key={idx}>
-            <div className={`stat-icon ${card.color}`}>{card.icon}</div>
-            <div className="stat-info">
-              <div className="stat-label">{card.label}</div>
-              <div className="stat-value">{card.value}</div>
-              <div className={`stat-trend ${card.trendDir}`}>
-                {card.trendDir === "up" ? <FaArrowUp /> : <FaArrowDown />}
-                {card.trend}
-              </div>
+      {/* ─── 6 Key KPI Cards ───────────────────────────────── */}
+      <div className="kpi-cards-grid">
+        {/* Total Revenue */}
+        <div className="kpi-card revenue-card">
+          <div className="kpi-card-top">
+            <div className="kpi-icon-wrap emerald">
+              <FaDollarSign />
             </div>
+            <span className="kpi-trend up">
+              <FaArrowUp /> Active
+            </span>
           </div>
-        ))}
+          <div className="kpi-value">₹{Number(stats.totalRevenue).toLocaleString()}</div>
+          <div className="kpi-label">Gross Revenue</div>
+        </div>
+
+        {/* Total Orders */}
+        <div className="kpi-card">
+          <div className="kpi-card-top">
+            <div className="kpi-icon-wrap blue">
+              <FaShoppingCart />
+            </div>
+            <span className="kpi-trend up">
+              <FaArrowUp /> {stats.orders} Total
+            </span>
+          </div>
+          <div className="kpi-value">{stats.orders}</div>
+          <div className="kpi-label">Total Orders Placed</div>
+        </div>
+
+        {/* Total Products */}
+        <div className="kpi-card">
+          <div className="kpi-card-top">
+            <div className="kpi-icon-wrap indigo">
+              <FaBox />
+            </div>
+            <span className="kpi-trend neutral">
+              {stats.totalStock} Units
+            </span>
+          </div>
+          <div className="kpi-value">{stats.products}</div>
+          <div className="kpi-label">Active Products</div>
+        </div>
+
+        {/* Low Stock Alert */}
+        <div className={`kpi-card ${stats.lowStock > 0 ? "warning-card" : ""}`}>
+          <div className="kpi-card-top">
+            <div className="kpi-icon-wrap rose">
+              <FaExclamationTriangle />
+            </div>
+            <span className={`kpi-trend ${stats.lowStock > 0 ? "down" : "up"}`}>
+              {stats.lowStock > 0 ? "Attention" : "Optimal"}
+            </span>
+          </div>
+          <div className="kpi-value">{stats.lowStock}</div>
+          <div className="kpi-label">Low Stock Alerts (&lt; 5)</div>
+        </div>
+
+        {/* Users */}
+        <div className="kpi-card">
+          <div className="kpi-card-top">
+            <div className="kpi-icon-wrap purple">
+              <FaUsers />
+            </div>
+            <span className="kpi-trend up">
+              <FaArrowUp /> Accounts
+            </span>
+          </div>
+          <div className="kpi-value">{stats.users}</div>
+          <div className="kpi-label">Registered Users</div>
+        </div>
+
+        {/* Suppliers & Categories */}
+        <div className="kpi-card">
+          <div className="kpi-card-top">
+            <div className="kpi-icon-wrap amber">
+              <FaTruck />
+            </div>
+            <span className="kpi-trend neutral">
+              {stats.categories} Groups
+            </span>
+          </div>
+          <div className="kpi-value">{stats.suppliers}</div>
+          <div className="kpi-label">Active Suppliers</div>
+        </div>
       </div>
 
-      {/* ─── Dashboard Grid (2 columns) ──────────────────── */}
-      <div className="dashboard-grid">
-        {/* ─── Circular Progress Section ──────────────────── */}
-        <div className="section-card">
-          <div className="section-title">
-            <FaChartPie /> Performance Overview
+      {/* ─── Main Two-Column Analytics Section ──────────────── */}
+      <div className="analytics-dual-grid">
+        {/* Performance Gauges Card */}
+        <div className="analytics-card">
+          <div className="card-header-line">
+            <div className="card-heading">
+              <FaChartPie className="card-header-icon blue" />
+              <h3>System Health & Performance</h3>
+            </div>
           </div>
-          <div className="circular-progress-container">
+
+          <div className="circular-gauges-row">
             <CircularProgress
               percentage={stockHealth}
-              color="blue"
+              color="emerald"
               label="Stock Health"
               sublabel={`${stats.totalStock} total units`}
             />
             <CircularProgress
               percentage={orderFulfillment}
-              color="green"
-              label="Order Fulfillment"
-              sublabel={`${stats.cashOrders} Cash · ${stats.onlineOrders} Online`}
+              color="blue"
+              label="Order Rate"
+              sublabel={`${stats.orders} transactions`}
             />
             <CircularProgress
               percentage={supplierActivity}
               color="purple"
-              label="Supplier Activity"
-              sublabel={`${stats.suppliers} active`}
+              label="Supplier Reach"
+              sublabel={`${stats.suppliers} active partners`}
             />
             <CircularProgress
               percentage={categoryCoverage}
-              color="orange"
-              label="Category Coverage"
+              color="amber"
+              label="Catalog Spread"
               sublabel={`${stats.categories} categories`}
             />
           </div>
-        </div>
 
-        {/* ─── System Architecture ────────────────────────── */}
-        <div className="section-card">
-          <div className="section-title">
-            <FaCubes /> System Architecture
-          </div>
-          <div className="architecture-grid">
-            {architectureItems.map((item, idx) => (
-              <div className="arch-item" key={idx}>
-                <div className={`arch-icon ${item.color}`}>{item.icon}</div>
-                <div className="arch-name">{item.name}</div>
-                <div className="arch-count">{item.count}</div>
+          {/* Progress Bars Breakdown */}
+          <div className="linear-progress-list">
+            <div className="linear-item">
+              <div className="linear-header">
+                <span>Cash on Delivery Orders</span>
+                <strong>{stats.cashOrders} orders ({stats.orders ? Math.round((stats.cashOrders / stats.orders) * 100) : 0}%)</strong>
               </div>
-            ))}
+              <div className="linear-track">
+                <div
+                  className="linear-fill green"
+                  style={{ width: `${stats.orders ? (stats.cashOrders / stats.orders) * 100 : 0}%` }}
+                ></div>
+              </div>
+            </div>
+
+            <div className="linear-item">
+              <div className="linear-header">
+                <span>Online / Prepaid Orders</span>
+                <strong>{stats.onlineOrders} orders ({stats.orders ? Math.round((stats.onlineOrders / stats.orders) * 100) : 0}%)</strong>
+              </div>
+              <div className="linear-track">
+                <div
+                  className="linear-fill blue"
+                  style={{ width: `${stats.orders ? (stats.onlineOrders / stats.orders) * 100 : 0}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* System Overview & Low Stock Alert Card */}
+        <div className="analytics-card">
+          <div className="card-header-line">
+            <div className="card-heading">
+              <FaCubes className="card-header-icon purple" />
+              <h3>Infrastructure Overview</h3>
+            </div>
+          </div>
+
+          <div className="infra-stats-grid">
+            <div className="infra-stat-pill">
+              <FaLayerGroup className="infra-icon blue" />
+              <div>
+                <span className="infra-count">{stats.categories}</span>
+                <small className="infra-name">Categories</small>
+              </div>
+            </div>
+            <div className="infra-stat-pill">
+              <FaBoxes className="infra-icon green" />
+              <div>
+                <span className="infra-count">{stats.products}</span>
+                <small className="infra-name">Products</small>
+              </div>
+            </div>
+            <div className="infra-stat-pill">
+              <FaTruck className="infra-icon amber" />
+              <div>
+                <span className="infra-count">{stats.suppliers}</span>
+                <small className="infra-name">Suppliers</small>
+              </div>
+            </div>
+            <div className="infra-stat-pill">
+              <FaUsers className="infra-icon purple" />
+              <div>
+                <span className="infra-count">{stats.users}</span>
+                <small className="infra-name">Accounts</small>
+              </div>
+            </div>
+          </div>
+
+          {/* Low Stock Highlight Alert Box */}
+          <div className="low-stock-alert-box">
+            <div className="alert-box-header">
+              <FaExclamationTriangle className="alert-box-icon" />
+              <strong>Critical Inventory Warning</strong>
+            </div>
+            {stats.lowStockItems.length > 0 ? (
+              <ul className="low-stock-mini-list">
+                {stats.lowStockItems.map((item) => (
+                  <li key={item._id} className="low-stock-item-row">
+                    <span className="low-item-name">{item.name}</span>
+                    <span className="low-item-stock-tag">
+                      {item.stock} in stock
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="no-low-stock-text">
+                ✅ All inventory levels are above the safety threshold.
+              </p>
+            )}
           </div>
         </div>
       </div>
 
-      {/* ─── Bottom Stats (Progress Bars) ────────────────── */}
-      <div className="bottom-stats-grid">
-        {bottomStats.map((stat, idx) => (
-          <div className="bottom-stat-item" key={idx}>
-            <div className="bottom-stat-header">
-              <span className="bottom-label">{stat.label}</span>
-              <span className="bottom-value">{stat.value}</span>
-            </div>
-            <div className="progress-bar-track">
-              <div
-                className={`progress-bar-fill ${stat.color}`}
-                style={{ width: `${stat.percent}%` }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* ─── Recent Orders ───────────────────────────────── */}
+      {/* ─── Recent Transactions Card ──────────────────────── */}
       {stats.recentOrders.length > 0 && (
-        <div
-          className="section-card"
-          style={{ marginTop: 25 }}
-        >
-          <div className="section-title">
-            <FaClipboardList /> Recent Orders
+        <div className="recent-orders-card">
+          <div className="card-header-line">
+            <div className="card-heading">
+              <FaClipboardList className="card-header-icon emerald" />
+              <h3>Recent Order Transactions</h3>
+            </div>
+            <span className="recent-order-count-badge">
+              Latest {stats.recentOrders.length} Orders
+            </span>
           </div>
-          <div className="recent-orders-list">
-            {stats.recentOrders.map((order, idx) => (
-              <div className="recent-order-row" key={order._id || idx}>
-                <div>
-                  <div className="order-customer">
-                    {order.customerId?.name || "Unknown"}
-                  </div>
-                  <div className="order-product">
-                    {order.productId?.name || "N/A"} × {order.quantity || 0}
-                  </div>
-                </div>
-                <div style={{ textAlign: "right" }}>
-                  <div className="order-amount">
-                    ₹ {Number(order.price || 0).toLocaleString()}
-                  </div>
-                  <span
-                    className={`order-payment ${
-                      order.paymentId === "Cash" ? "cash" : "online"
-                    }`}
-                  >
-                    {order.paymentId || "N/A"}
-                  </span>
-                </div>
-              </div>
-            ))}
+
+          <div className="orders-table-wrapper">
+            <table className="recent-orders-table">
+              <thead>
+                <tr>
+                  <th>Order Reference</th>
+                  <th>Customer</th>
+                  <th>Product</th>
+                  <th>Qty</th>
+                  <th>Total Amount</th>
+                  <th>Payment</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stats.recentOrders.map((order, idx) => (
+                  <tr key={order._id || idx}>
+                    <td>
+                      <span className="order-ref-code">
+                        INV-{order._id?.slice(-6).toUpperCase()}
+                      </span>
+                    </td>
+                    <td>
+                      <strong>{order.customerId?.name || "Customer"}</strong>
+                    </td>
+                    <td>{order.productId?.name || "Product"}</td>
+                    <td>
+                      <span className="order-qty-pill">{order.quantity}</span>
+                    </td>
+                    <td>
+                      <strong className="order-price-text">
+                        ₹{Number(order.price || 0).toLocaleString()}
+                      </strong>
+                    </td>
+                    <td>
+                      <span
+                        className={`payment-pill ${
+                          (order.paymentId || "").toLowerCase() === "cash"
+                            ? "cash"
+                            : "online"
+                        }`}
+                      >
+                        {(order.paymentId || "CASH").toUpperCase()}
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        className={`status-pill ${
+                          (order.status || "Pending").toLowerCase()
+                        }`}
+                      >
+                        {order.status || "Pending"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
@@ -430,4 +519,3 @@ const [productsRes, ordersRes, usersRes, categoriesRes, suppliersRes] =
 };
 
 export default Dashboard;
-

@@ -1,487 +1,461 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react'
-import "./User.css"
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import {
+  FaUser,
+  FaEnvelope,
+  FaLock,
+  FaShieldAlt,
+  FaUserTag,
+  FaMapMarkerAlt,
+  FaSearch,
+  FaEdit,
+  FaTrash,
+  FaEye,
+  FaPlus,
+  FaTimes,
+  FaCheck,
+  FaCrown,
+  FaShoppingBag,
+} from "react-icons/fa";
+import "./User.css";
+
+const API_BASE = "http://localhost:5000/api";
+const getToken = () => localStorage.getItem("pos-token");
+const headers = () => ({
+  headers: { Authorization: `Bearer ${getToken()}` },
+});
 
 const User = () => {
-const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [editUserId, setEditUserId] = useState(null);
   const [viewModal, setViewModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+
   const [formdata, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     address: "",
-    role: "",
+    role: "customer",
   });
 
-  const filtereUsers = users.filter(
-    (user) =>
-      user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.role?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.address?.toLowerCase().includes(searchTerm.toLowerCase())
-
-  );
-  const Info = ({ label, value }) => (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        padding: "12px 0",
-        borderBottom: "1px solid #E5E7EB",
-      }}
-    >
-      <strong>{label}</strong>
-
-      <span>{value}</span>
-    </div>
-  );
-  const handlerChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  }
-
-  const fetchUser = async () => {
+  const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/api/users", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
-        },
-      });
-      
-      setUsers(response.data.users);
-      setLoading(false);
+      const response = await axios.get(`${API_BASE}/users`, headers());
+      if (response.data.success || response.data.users) {
+        setUsers(response.data.users || []);
+      }
     } catch (error) {
-      // console.error("Error fetching categories:", error);
+      console.error("Error fetching users:", error);
+    } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-
-    fetchUser();
+    fetchUsers();
   }, []);
 
-   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this User?");
-    if (confirmDelete) {
-      try {
-        const response = await axios.delete(`http://localhost:5000/api/users/${id}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
-          },
-        });
-        if (response.data.success) {
-          alert("User deleted successfully!");
-          fetchUser();
-        } else {
-          // console.error("Error deleting category:", data);
-          alert("Error deleting user. Please try again.");
-        }
-      } catch (error) {
-        // console.error("Error deleting category:", error);
-        alert("Error deleting user. Please try again.");
-      }
-    }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
-const handelEdit = (user) => {
+
+  const handleEdit = (user) => {
     setEditUserId(user._id);
     setFormData({
       name: user.name || "",
       email: user.email || "",
-      password: user.password || "",
+      password: "",
       address: user.address || "",
-      role: user.role || "",
+      role: user.role || "customer",
     });
-  }
+  };
 
- const handleCancel = () => {
-      setEditUserId(null);
+  const handleCancel = () => {
+    setEditUserId(null);
     setFormData({
       name: "",
       email: "",
       password: "",
       address: "",
-      role: "",
+      role: "customer",
     });
+  };
 
-
- }
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editUserId) {
-      const response = await axios.put(`http://localhost:5000/api/users/${editUserId}`,
-        formdata,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
-          },
-        }
-      );
-      if (response.data.success) {
-        alert("User updated Successfully");
-        fetchUser();
-        setFormData({
-          name: "",
-          email: "",
-          password: "",
-          address: "",
-          role: "",
-        });
-        setEditUserId(null);
-      } else {
-        alert("Error updating user. please try again.");
-      }
-    } else {
-      const response = await axios.post("http://localhost:5000/api/users/add",
-        formdata,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
-          },
-        }
-      );
-
-      if (response.data.success) {
-        alert("User added Successfully");
-        fetchUser();
-        setFormData({
-          name: "",
-          email: "",
-          password: "",
-          address: "",
-          role: "",
-        });
-      } else {
-        alert("Error adding users. please try again.");
-      }
+    if (!formdata.name.trim() || !formdata.email.trim()) {
+      alert("Please fill in required name and email fields.");
+      return;
     }
-  }
+
+    setSubmitting(true);
+    try {
+      if (editUserId) {
+        const response = await axios.put(
+          `${API_BASE}/users/${editUserId}`,
+          formdata,
+          headers()
+        );
+
+        if (response.data.success) {
+          handleCancel();
+          fetchUsers();
+        } else {
+          alert("Error updating user.");
+        }
+      } else {
+        const response = await axios.post(
+          `${API_BASE}/users/add`,
+          formdata,
+          headers()
+        );
+
+        if (response.data.success) {
+          handleCancel();
+          fetchUsers();
+        } else {
+          alert("Error adding user.");
+        }
+      }
+    } catch (error) {
+      console.error("Submit User Error:", error);
+      alert("Failed to save user account.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this user account?")) return;
+    try {
+      const response = await axios.delete(`${API_BASE}/users/${id}`, headers());
+      if (response.data.success) {
+        fetchUsers();
+      } else {
+        alert("Error deleting user.");
+      }
+    } catch (error) {
+      console.error("Delete user error:", error);
+      alert("Failed to delete user.");
+    }
+  };
+
+  const handleSaveStatus = async () => {
+    if (!selectedUser) return;
+    try {
+      const response = await axios.put(
+        `${API_BASE}/users/${selectedUser._id}`,
+        { status: selectedUser.status },
+        headers()
+      );
+      if (response.data.success) {
+        fetchUsers();
+        setViewModal(false);
+      }
+    } catch (error) {
+      console.error("Update status error:", error);
+      alert("Failed to update user status.");
+    }
+  };
+
+  const filteredUsers = users.filter(
+    (user) =>
+      (user.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (user.email || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (user.role || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (user.address || "").toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-     <div className="user-page">
+    <div className="user-module-root">
+      {/* ─── Header Info ────────────────────────────────────── */}
+      <div className="module-header-row">
+        <div>
+          <h2 className="module-title">User Accounts & RBAC</h2>
+          <p className="module-subtitle">Manage superadmin, admin, and customer roles and access privileges</p>
+        </div>
 
-  {/* Left Side */}
-  <div className="user-left">
-
-    <div className="user-form-card">
-
-      <div className="user-form-header">
-        <h2>{editUserId ? "Edit User" : "Add User"}</h2>
-        <p>Create and manage users</p>
+        <div className="user-stats-pill">
+          <FaShieldAlt /> {users.length} Registered Accounts
+        </div>
       </div>
 
-      <div className="user-form-body">
-
-        <form className="user-form" onSubmit={handleSubmit}>
-
-          <div className="form-group">
-            <label>Name</label>
-            <input
-              type="text"
-              name="name"
-              value={formdata.name}
-              onChange={handlerChange}
-              placeholder="Enter full name"
-            />
+      <div className="user-grid-layout">
+        {/* ─── Left Form Card ───────────────────────────────── */}
+        <div className="user-form-card">
+          <div className="form-header-box">
+            <div className="form-header-icon">
+              <FaUser />
+            </div>
+            <div>
+              <h3>{editUserId ? "Edit User Account" : "Add New User"}</h3>
+              <p>{editUserId ? "Modify credentials & access role" : "Create a new administrator or customer"}</p>
+            </div>
           </div>
 
-          <div className="form-group">
-            <label>Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formdata.email}
-              onChange={handlerChange}
-              placeholder="Enter email"
-            />
-          </div>
+          <form onSubmit={handleSubmit} className="user-form-body">
+            <div className="form-field-group">
+              <label>Full Name *</label>
+              <input
+                type="text"
+                name="name"
+                value={formdata.name}
+                onChange={handleChange}
+                placeholder="e.g. John Doe"
+                required
+              />
+            </div>
 
-          <div className="form-group">
-            <label>Password</label>
-            <input
-              type="password"
-              name="password"
-              value={formdata.password}
-              onChange={handlerChange}
-              placeholder="Enter password"
-            />
-          </div>
+            <div className="form-field-group">
+              <label>Email Address *</label>
+              <input
+                type="email"
+                name="email"
+                value={formdata.email}
+                onChange={handleChange}
+                placeholder="user@example.com"
+                required
+              />
+            </div>
 
-          <div className="form-group">
-            <label>Role</label>
+            <div className="form-field-group">
+              <label>{editUserId ? "New Password (Optional)" : "Password *"}</label>
+              <input
+                type="password"
+                name="password"
+                value={formdata.password}
+                onChange={handleChange}
+                placeholder={editUserId ? "Leave blank to keep current password" : "••••••••"}
+                required={!editUserId}
+              />
+            </div>
 
-            <select
-              name="role"
-              value={formdata.role}
-              onChange={handlerChange}
-            >
-              <option value="">Select Role</option>
-              <option value="admin">Admin</option>
-              <option value="customer">Customer</option>
-            </select>
+            <div className="form-field-group">
+              <label>System Role *</label>
+              <select name="role" value={formdata.role} onChange={handleChange} required>
+                <option value="customer">Customer (Order & Shop)</option>
+                <option value="admin">Admin (Manage Stock & Orders)</option>
+                <option value="superadmin">SuperAdmin (Full Root Access)</option>
+              </select>
+            </div>
 
-          </div>
+            <div className="form-field-group">
+              <label>Address</label>
+              <textarea
+                rows="2"
+                name="address"
+                value={formdata.address}
+                onChange={handleChange}
+                placeholder="Delivery / billing address..."
+              />
+            </div>
 
-          <div className="button-group">
-
-            <button
-              type="submit"
-              className="save-btn"
-            >
-              {editUserId ? "Save Changes" : "Add User"}
-            </button>
-
-            {editUserId && (
-              <button
-                type="button"
-                className="cancel-btn"
-                onClick={handleCancel}
-              >
-                Cancel
+            <div className="form-actions-group">
+              <button type="submit" className="user-submit-btn" disabled={submitting}>
+                {submitting ? "Saving..." : editUserId ? <><FaCheck /> Update User</> : <><FaPlus /> Add User</>}
               </button>
-            )}
 
+              {editUserId && (
+                <button type="button" className="user-cancel-btn" onClick={handleCancel}>
+                  <FaTimes /> Cancel
+                </button>
+              )}
+            </div>
+          </form>
+        </div>
+
+        {/* ─── Right Table Card ──────────────────────────────── */}
+        <div className="user-table-card">
+          <div className="table-top-controls">
+            <div className="table-search-box">
+              <FaSearch className="table-search-icon" />
+              <input
+                type="text"
+                placeholder="Search by name, email, role..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <span className="results-count-tag">{filteredUsers.length} Users</span>
           </div>
 
-        </form>
-
-      </div>
-
-    </div>
-
-  </div>
-
-  {/* Right Side */}
-  <div className="user-right">
-
-    <div className="table-card">
-
-      <div className="table-header">
-
-        <h2>Manage Users</h2>
-
-        <input
-          type="text"
-          className="search-box"
-          placeholder="Search user..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-
-      </div>
-
-      <div className="table-responsive">
-
-        <table className="user-table">
-
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>User</th>    
-              <th>Role</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-
-            {filtereUsers.length > 0 ? (
-
-              filtereUsers.map((user, index) => (
-
-                <tr key={user._id}>
-
-                  <td>
-                    <div className="id-circle">
-                      {index + 1}
-                    </div>
-                  </td>
-
-                  <td className="user-name">
-                    {user.name}
-                  </td>
-
-
-
-                  <td>
-                    <span className={`role-badge role-${user.role}`}>
-                      {user.role}
-                    </span>
-                  </td>
-
-
-                  <td>
-
-                    <div className="User-action-buttons">
-                      
-                        {(user.role === "admin" || user.role === "customer") && (
-                      <>
-                      <button
-                        className="edit-btn"
-                        onClick={() => handelEdit(user)}
-                      >
-                        Edit
-                      </button>
-
-                      <button
-                        className="view-btn"
-                       onClick={() => {
-                          setSelectedUser(user);
-                            setViewModal(true);
-                        }}
-                      >
-                        View
-                      </button>
-
-                      <button
-                        className="delete-btn"
-                        onClick={() => handleDelete(user._id)}
-                      >
-                        Delete
-                      </button>
-                      
-                        </>
-                      )}
-                    </div>
-
-                  </td>
-
+          <div className="table-container">
+            <table className="user-data-table">
+              <thead>
+                <tr>
+                  <th style={{ width: "50px" }}>#</th>
+                  <th>User Profile</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th style={{ textAlign: "right", width: "170px" }}>Actions</th>
                 </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan="5" className="empty-state-cell">
+                      Loading Users...
+                    </td>
+                  </tr>
+                ) : filteredUsers.length > 0 ? (
+                  filteredUsers.map((u, index) => {
+                    const role = (u.role || "customer").toLowerCase();
+                    const isSuper = role === "superadmin";
+                    const isAdmin = role === "admin";
 
-              ))
+                    return (
+                      <tr key={u._id}>
+                        <td>
+                          <span className="row-index-badge">{index + 1}</span>
+                        </td>
+                        <td>
+                          <div className="user-avatar-cell">
+                            <div className={`user-avatar-badge ${role}`}>
+                              {isSuper ? <FaCrown /> : u.name?.charAt(0).toUpperCase() || "U"}
+                            </div>
+                            <div>
+                              <strong className="user-name">{u.name?.charAt(0).toUpperCase() + u.name?.slice(1)}</strong>
 
-            ) : (
-
-              <tr>
-                <td colSpan="7" className="empty">
-                  No Users Found
-                </td>
-              </tr>
-
-            )}
-
-          </tbody>
-
-        </table>
-
-      </div>
-  
-    </div>
-
-  </div>
-  {viewModal && selectedUser && (
-  <div className="user-modal">
-
-    <div className="user-modal-card">
-
-      <div className="user-modal-inner">
-
-        {/* Header */}
-        <div className="user-modal-header">
-
-          <div className="user-avatar">
-            {selectedUser.name?.charAt(0).toUpperCase()}
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <span className={`role-pill ${role}`}>
+                            {isSuper ? " SuperAdmin" : isAdmin ? " Admin" : " Customer"}
+                          </span>
+                        </td>
+                        <td>
+                          <span
+                            className={`user-status-pill ${(u.status || "Active").toLowerCase()
+                              }`}
+                          >
+                            {u.status || "Active"}
+                          </span>
+                        </td>
+                        <td>
+                          {isSuper ? (
+                            <div className="table-action-btn-row">
+                              <span className="protected-pill" title="Superadmin account cannot be modified or deleted">
+                                🔒 Protected
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="table-action-btn-row">
+                              <button
+                                className="action-btn view-action"
+                                onClick={() => {
+                                  setSelectedUser(u);
+                                  setViewModal(true);
+                                }}
+                                title="View User Details"
+                              >
+                                <FaEye />
+                              </button>
+                              <button
+                                className="action-btn edit-action"
+                                onClick={() => handleEdit(u)}
+                                title="Edit User"
+                              >
+                                <FaEdit />
+                              </button>
+                              <button
+                                className="action-btn delete-action"
+                                onClick={() => handleDelete(u._id)}
+                                title="Delete User"
+                              >
+                                <FaTrash />
+                              </button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="empty-state-cell">
+                      No users found matching your search.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
-
-          <h2>{selectedUser.name}</h2>
-
         </div>
-
-        {/* Body */}
-        <div className="user-modal-body">
-
-          <div className="user-detail-row">
-            <span>Name</span>
-            <strong>{selectedUser.name}</strong>
-          </div>
-
-          <div className="user-detail-row">
-            <span>Email</span>
-            <strong>{selectedUser.email}</strong>
-          </div>
-
-
-          <div className="user-detail-row">
-            <span>Address</span>
-            <strong>{selectedUser.address}</strong>
-          </div>
-
-          <div className="user-detail-row">
-            <span>Role</span>
-            <strong>{selectedUser.role}</strong>
-          </div>
-
-          <div className="user-detail-row">
-            <span>Status</span>
-
-            <span
-              className={`status-badge ${
-                selectedUser.status === "Blocked"
-                  ? "status-blocked"
-                  : selectedUser.status === "Deactive"
-                  ? "status-deactive"
-                  : "status-active"
-              }`}
-            >
-              {selectedUser.status || "Active"}
-            </span>
-          </div>
-
-          {/* Change Status */}
-
-          <select
-            className="status-select"
-            value={selectedUser.status || "Active"}
-            onChange={(e) =>
-              setSelectedUser({
-                ...selectedUser,
-                status: e.target.value,
-              })
-            }
-          >
-            <option value="Active">Active</option>
-            <option value="Deactive">Deactive</option>
-            <option value="Blocked">Blocked</option>
-          </select>
-
-          {/* Buttons */}
-
-          <div className="user-modal-buttons">
-
-            <button
-              className="save-status-btn"
-            >
-              Save Status
-            </button>
-
-            <button
-              className="close-user-btn"
-              onClick={() => setViewModal(false)}
-            >
-              Close
-            </button>
-
-          </div>
-
-        </div>
-
       </div>
 
+      {/* ─── View / Manage User Modal ───────────────────────── */}
+      {viewModal && selectedUser && (
+        <div className="user-modal-overlay" onClick={() => setViewModal(false)}>
+          <div className="user-modal-box" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header-line">
+              <div className="modal-heading">
+                <FaUser className="modal-header-icon blue" />
+                <h3>User Profile Details</h3>
+              </div>
+              <button className="modal-close-x" onClick={() => setViewModal(false)}>✕</button>
+            </div>
+
+            <div className="user-modal-profile-header">
+              <div className={`modal-user-avatar ${(selectedUser.role || "customer").toLowerCase()}`}>
+                {selectedUser.role === "superadmin" ? (
+                  <FaCrown />
+                ) : (
+                  selectedUser.name?.charAt(0).toUpperCase() || "U"
+                )}
+              </div>
+              <h4>{selectedUser.name}</h4>
+              <span className={`role-pill ${(selectedUser.role || "customer").toLowerCase()}`}>
+                {selectedUser.role}
+              </span>
+            </div>
+
+            <div className="user-detail-list">
+              <div className="u-detail-row">
+                <span>Email Address:</span>
+                <strong>{selectedUser.email}</strong>
+              </div>
+              <div className="u-detail-row">
+                <span>Delivery Address:</span>
+                <strong>{selectedUser.address || "None specified"}</strong>
+              </div>
+              <div className="u-detail-row">
+                <span>Account Status:</span>
+                <select
+                  className="user-status-select"
+                  value={selectedUser.status || "Active"}
+                  onChange={(e) =>
+                    setSelectedUser({ ...selectedUser, status: e.target.value })
+                  }
+                >
+                  <option value="Active">Active</option>
+                  <option value="Deactive">Deactive</option>
+                  <option value="Blocked">Blocked</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="modal-actions-row">
+              <button type="button" className="modal-primary-btn" onClick={handleSaveStatus}>
+                Save Status
+              </button>
+              <button type="button" className="modal-secondary-btn" onClick={() => setViewModal(false)}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-
-  </div>
-)}
-
-</div>
-
-
   );
 };
 

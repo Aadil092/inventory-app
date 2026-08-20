@@ -1,154 +1,138 @@
 import React, { useState } from "react";
-import { FaBox, FaShoppingBasket, FaSignOutAlt, FaUsers } from "react-icons/fa";
+import {
+  FaBox,
+  FaBoxOpen,
+  FaMoon,
+  FaShoppingBasket,
+  FaSignOutAlt,
+  FaSun,
+  FaUserCircle,
+  FaUsers,
+} from "react-icons/fa";
 import { useNavigate } from "react-router";
+import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 import CustomerProduct from "../components/CustomerProduct";
 import CustomerOrder from "../components/CustomerOrder";
 import CustomerProfile from "../components/CustomerProfile";
-import "./CustomerDashboard.css"
+import "./CustomerDashboard.css";
 
 export default function CustomerDashboard() {
   const [activePage, setActivePage] = useState("products");
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const { theme, toggleTheme, isDark } = useTheme();
 
- 
-   const menuItems = [
-    { key: "products", label: "Products", icon: <FaBox /> },
-    { key: "order", label: " Orders", icon: <FaShoppingBasket /> },
-    { key: "profile", label: "Profile", icon: <FaUsers /> },
-    { key: "logout", label: " Logout", icon: <FaSignOutAlt /> },
+  const menuItems = [
+    { key: "products", label: "Browse Products", icon: <FaBox /> },
+    { key: "order", label: "My Orders", icon: <FaShoppingBasket /> },
+    { key: "profile", label: "My Profile", icon: <FaUsers /> },
   ];
 
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
+  const getPageTitle = () => {
+    const item = menuItems.find((m) => m.key === activePage);
+    return item ? item.label : "Customer Portal";
+  };
+
   return (
-    // <div style={containerStyle}>
-    //   <aside style={sidebarStyle}>
-    //     <h1> Customer</h1>
-    //      <ul style={{ listStyle: "none", padding: 0.25 }}>
-    //       {menuItems.map((item) => (
-    //         <li
-    //           key={item.key}
-    //           style={{
-    //             cursor: "pointer",
-    //             margin: "12px 2px",
-    //             display: "flex",            // flex layout
-    //             alignItems: "center",       // vertical center
-    //             padding: "8px 12px",
-    //             borderRadius: "6px",
-    //             transition: "background 0.3s, color 0.3s",
-    //             color: activePage === item.key ? "#e6e6e5" : "#eae1e1",
-    //           }}
-    //           onClick={() => {
-    //             if (item.key === "logout") {
-    //               navigate("/login"); // ✅ redirect to login
-    //             } else {
-    //               setActivePage(item.key);
-    //             }
-    //           }}
-    //           onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.2)")}
-    //           onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-    //         >
-    //           <span style={{ fontSize: "1.5rem" }}>{item.icon}</span>
-    //           <a href={item.path} style={{ marginLeft: "12px", textDecoration: "none", color: "inherit" }}>
-    //             {item.label}
-    //           </a>
-    //         </li>
+    <div className={`customer-dashboard-layout ${isDark ? "dark-theme" : "light-theme"}`}>
+      {/* ─── Sidebar ────────────────────────────────────────── */}
+      <aside className="customer-sidebar">
+        <div className="sidebar-brand-box">
+          <div className="brand-logo-icon">
+            <FaBoxOpen />
+          </div>
+          <div className="brand-text-group">
+            <h2 className="brand-name">Inventory Management System</h2>
+            <span className="brand-badge customer-badge">Customer Portal</span>
+          </div>
+        </div>
 
-    //       ))}
-    //     </ul>
-    //   </aside>
+        <nav className="sidebar-nav-list">
+          {menuItems.map((item) => (
+            <button
+              key={item.key}
+              className={`nav-menu-btn ${activePage === item.key ? "active" : ""}`}
+              onClick={() => setActivePage(item.key)}
+            >
+              <span className="nav-icon-wrapper">{item.icon}</span>
+              <span className="nav-label-text">{item.label}</span>
+              {activePage === item.key && <span className="active-dot"></span>}
+            </button>
+          ))}
+        </nav>
 
-    //   <main style={contentStyle}>
-    //     {activePage === "products" && (
-    //       <>
-    //         <h2>Products</h2>
-    //         <div>
-    //           <CustomerProduct/>
-    //         </div>
-  
-    //       </>
-    //     )}
-    //     {activePage === "order" && (
-    //       <>
-    //         <h2>Orders</h2>
-    //         <CustomerOrder/>
-       
-    //       </>
-    //     )}
-    //     {activePage === "profile" && (
-    //       <>
-    //         <h2>Profiles</h2>
-    //         <CustomerProfile/>
-    //       </>
-    //     )}
-    //   </main>
-    // </div>
+        {/* Sidebar User Footer */}
+        <div className="sidebar-user-footer">
+          <div className="user-avatar-circle">
+            {user?.name?.charAt(0).toUpperCase() || "C"}
+          </div>
+          <div className="user-meta-info">
+            <strong className="user-display-name">{user?.name || "Customer"}</strong>
+            <small className="user-email-text">{user?.email || "customer@mail.com"}</small>
+          </div>
+          <button
+            className="sidebar-logout-btn"
+            onClick={handleLogout}
+            title="Sign Out"
+          >
+            <FaSignOutAlt />
+          </button>
+        </div>
+      </aside>
 
-<div className="customer-dashboard">
+      {/* ─── Main Content Wrapper ────────────────────────────── */}
+      <div className="customer-main-wrapper">
+        {/* Top Navbar */}
+        <header className="customer-top-navbar">
+          <div className="navbar-breadcrumb">
+            <span className="breadcrumb-root">Customer Portal</span>
+            <span className="breadcrumb-separator">/</span>
+            <span className="breadcrumb-active">{getPageTitle()}</span>
+          </div>
 
-  {/* Sidebar */}
-  <aside className="customer-sidebar">
+          <div className="navbar-actions-group">
+            {/* Dark / Light Theme Toggle */}
+            <button
+              className="theme-toggle-btn"
+              onClick={toggleTheme}
+              title={`Switch to ${isDark ? "Light" : "Dark"} Mode`}
+            >
+              {isDark ? (
+                <>
+                  <FaSun className="theme-icon sun-icon" />
+                  <span className="theme-text">Light Mode</span>
+                </>
+              ) : (
+                <>
+                  <FaMoon className="theme-icon moon-icon" />
+                  <span className="theme-text">Dark Mode</span>
+                </>
+              )}
+            </button>
 
-    <div className="customer-logo">
-      <h1>Customer</h1>
+            {/* Profile Pill */}
+            <div className="nav-profile-pill">
+              <div className="nav-avatar">
+                {user?.name?.charAt(0).toUpperCase() || "C"}
+              </div>
+              <span className="nav-role-tag">Customer</span>
+            </div>
+          </div>
+        </header>
+
+        {/* Page Content Body */}
+        <main className="customer-page-body">
+          {activePage === "products" && <CustomerProduct />}
+          {activePage === "order" && <CustomerOrder />}
+          {activePage === "profile" && <CustomerProfile />}
+        </main>
+      </div>
     </div>
-
-    <ul className="customer-menu">
-
-      {menuItems.map((item) => (
-
-        <li
-          key={item.key}
-          className={`customer-menu-item ${
-            activePage === item.key ? "active" : ""
-          }`}
-          onClick={() => {
-            if (item.key === "logout") {
-              navigate("/login");
-            } else {
-              setActivePage(item.key);
-            }
-          }}
-        >
-          <span className="menu-icon">
-            {item.icon}
-          </span>
-
-          <span className="menu-text">
-            {item.label}
-          </span>
-
-        </li>
-
-      ))}
-
-    </ul>
-
-  </aside>
-
-  {/* Main Content */}
-
-  <main className="customer-content">
-
-    
-
-    <div className="customer-body">
-
-      {activePage === "products" && (
-        
-        <CustomerProduct />
-      )}
-
-      {activePage === "order" && (
-        <CustomerOrder />
-      )}
-
-      {activePage === "profile" && (
-        <CustomerProfile />
-      )}
-
-    </div>
-
-  </main>
-
-</div>
   );
 }

@@ -1,16 +1,20 @@
 import React, { useState } from "react";
 import {
   FaBox,
+  FaBoxOpen,
   FaCog,
   FaHome,
+  FaMoon,
   FaShoppingCart,
   FaSignOutAlt,
-  FaTruck,
+  FaSun,
   FaTable,
-  FaUserCircle,
+  FaTruck,
+  FaUserShield,
 } from "react-icons/fa";
 import { useNavigate } from "react-router";
-
+import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 import "./AdminDashboard.css";
 
 import Categories from "../components/Categories";
@@ -22,155 +26,138 @@ import CustomerProfile from "../components/CustomerProfile";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const { theme, toggleTheme, isDark } = useTheme();
   const [activePage, setActivePage] = useState("dashboard");
 
   const menuItems = [
     { key: "dashboard", label: "Dashboard", icon: <FaHome /> },
     { key: "categories", label: "Categories", icon: <FaTable /> },
-    { key: "products", label: "Products", icon: <FaBox /> },
+    { key: "products", label: "Products & Stock", icon: <FaBox /> },
     { key: "orders", label: "Manage Orders", icon: <FaShoppingCart /> },
     { key: "supplier", label: "Suppliers", icon: <FaTruck /> },
-    { key: "profile", label: "Profile", icon: <FaCog /> },
-    { key: "logout", label: "Logout", icon: <FaSignOutAlt /> },
+    { key: "profile", label: "My Profile", icon: <FaCog /> },
   ];
 
   const handleMenu = (key) => {
-    if (key === "logout") {
-      localStorage.removeItem("pos-token");
-      navigate("/login");
-      return;
-    }
-
     setActivePage(key);
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
+  const getPageTitle = () => {
+    const item = menuItems.find((m) => m.key === activePage);
+    return item ? item.label : "Admin Portal";
+  };
+
   return (
-    <div className="admin-dashboard">
-
-      {/* Sidebar */}
-
-      <aside className="sidebar">
-
-        <div className="sidebar-logo">
-
-          <div className="logo-icon">
-            📦
+    <div className={`admin-dashboard-layout ${isDark ? "dark-theme" : "light-theme"}`}>
+      {/* ─── Sidebar ────────────────────────────────────────── */}
+      <aside className="admin-sidebar">
+        {/* Brand Header */}
+        <div className="sidebar-brand-box">
+          <div className="brand-logo-icon">
+            <FaBoxOpen />
           </div>
-
-          <h2 className="logo-title">INVENTORY</h2>
-
-          <small className="logo-subtitle">Management System</small>
-
+          <div className="brand-text-group">
+            <h2 className="brand-name">Inventory Management System</h2>
+            <span className="brand-badge admin-badge">Admin Portal</span>
+          </div>
         </div>
 
-        <div className="sidebar-menu">
-
+        {/* Navigation Menu */}
+        <nav className="sidebar-nav-list">
           {menuItems.map((item) => (
-            <div
+            <button
               key={item.key}
-              className={`menu-item ${
-                activePage === item.key ? "active" : ""
-              }`}
+              className={`nav-menu-btn ${activePage === item.key ? "active" : ""}`}
               onClick={() => handleMenu(item.key)}
             >
-              <span className="menu-icon">
-                {item.icon}
-              </span>
-
-              <span>{item.label}</span>
-            </div>
+              <span className="nav-icon-wrapper">{item.icon}</span>
+              <span className="nav-label-text">{item.label}</span>
+              {activePage === item.key && <span className="active-dot"></span>}
+            </button>
           ))}
+        </nav>
 
+        {/* Sidebar User Footer */}
+        <div className="sidebar-user-footer">
+          <div className="user-avatar-circle">
+            {user?.name?.charAt(0).toUpperCase() || "A"}
+          </div>
+          <div className="user-meta-info">
+            <strong className="user-display-name">{user?.name || "Admin User"}</strong>
+            <small className="user-email-text">{user?.email || "admin@inventory.local"}</small>
+          </div>
+          <button
+            className="sidebar-logout-btn"
+            onClick={handleLogout}
+            title="Sign Out"
+          >
+            <FaSignOutAlt />
+          </button>
         </div>
-
       </aside>
 
-      {/* Main */}
-
-      <div className="main-content">
-
-        {/* Header */}
-
-        {/* <div className="dashboard-header">
-
-          <div>
-
-            <h2 className="dashboard-title">
-              Inventory Management System
-            </h2>
-
-            <p className="dashboard-subtitle">
-              Welcome Administrator
-            </p>
-
+      {/* ─── Main Content Wrapper ────────────────────────────── */}
+      <div className="admin-main-wrapper">
+        {/* Top Navbar */}
+        <header className="admin-top-navbar">
+          <div className="navbar-breadcrumb">
+            <span className="breadcrumb-root">Admin Portal</span>
+            <span className="breadcrumb-separator">/</span>
+            <span className="breadcrumb-active">{getPageTitle()}</span>
           </div>
 
-          <div className="header-profile">
-
-            <FaUserCircle
-              size={45}
-              className="profile-icon"
-            />
-
-            <div>
-
-              <strong>Administrator</strong>
-
-              <p>admin@gmail.com</p>
-
+          <div className="navbar-actions-group">
+            {/* Live System Indicator */}
+            <div className="live-status-pill">
+              <span className="live-pulse-dot"></span>
+              <span>System Live</span>
             </div>
 
+            {/* Dark / Light Theme Toggle */}
+            <button
+              className="theme-toggle-btn"
+              onClick={toggleTheme}
+              title={`Switch to ${isDark ? "Light" : "Dark"} Mode`}
+            >
+              {isDark ? (
+                <>
+                  <FaSun className="theme-icon sun-icon" />
+                  <span className="theme-text">Light Mode</span>
+                </>
+              ) : (
+                <>
+                  <FaMoon className="theme-icon moon-icon" />
+                  <span className="theme-text">Dark Mode</span>
+                </>
+              )}
+            </button>
+
+            {/* Profile Pill */}
+            <div className="nav-profile-pill">
+              <div className="nav-avatar">
+                {user?.name?.charAt(0).toUpperCase() || "A"}
+              </div>
+              <span className="nav-role-tag">Admin</span>
+            </div>
           </div>
+        </header>
 
-        </div> */}
-
-        {/* Dashboard */}
-
-        {activePage === "dashboard" && (
-          <>
-            <h2 className="page-title">ADMIN DASHBOARD</h2>
-              <Dashboard/>
-
-          </>
-        )}
-
-        {activePage === "categories" && (
-          <>
-            <h2 className="page-title">Categories</h2>
-            <Categories />
-          </>
-        )}
-
-        {activePage === "products" && (
-          <>
-            <h2 className="page-title">Products</h2>
-            <Products />
-          </>
-        )}
-
-        {activePage === "orders" && (
-          <>
-            <h2 className="page-title">Manage Orders</h2>
-            <ManageOrder />
-          </>
-        )}
-
-        {activePage === "supplier" && (
-          <>
-            <h2 className="page-title">Supplier Management</h2>
-            <Supplier />
-          </>
-        )}
-
-        {activePage === "profile" && (
-        <>
-            <h2 className="page-title">Profile</h2>
-            <CustomerProfile/>
-      </>
-        )}
-
+        {/* Page Content Body */}
+        <main className="admin-page-body">
+          {activePage === "dashboard" && <Dashboard />}
+          {activePage === "categories" && <Categories />}
+          {activePage === "products" && <Products />}
+          {activePage === "orders" && <ManageOrder />}
+          {activePage === "supplier" && <Supplier />}
+          {activePage === "profile" && <CustomerProfile />}
+        </main>
       </div>
-
     </div>
   );
 }

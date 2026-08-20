@@ -1,367 +1,46 @@
-/*==============================
-ADD BUTTON
-==============================*/
+/* =========================================================
+   CITY COMPONENT STYLES - MODERN ENTERPRISE UI
+============================================================ */
 
-.add-city-btn{
-    position: relative;
-    padding: 14px 28px;
-    border: 2px solid #2563EB;
-    border-radius: 14px;
-    background: #fff;
-    color: #000000;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    overflow: hidden;
-    transition: .35s ease;
-    z-index: 1;
+.add-city-trigger-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--bg-primary, #f8fafc);
+  color: var(--text-main, #0f172a);
+  border: 1px solid var(--border-color, #cbd5e1);
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-/* Animated Border */
-.add-city-btn::before{
-    content: "";
-    position: absolute;
-    inset: -2px;
-    border-radius: 14px;
-    background: linear-gradient(
-        90deg,
-        #2563EB,
-        #3B82F6,
-        #10B981,
-        #22C55E,
-        #2563EB
-    );
-    background-size: 300% 300%;
-    animation: borderMove 6s linear infinite;
-    z-index: -2;
+.add-city-trigger-btn:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+  transform: translateY(-1px);
 }
 
-/* White Inner Background */
-.add-city-btn::after{
-    content: "";
-    position: absolute;
-    inset: 2px;
-    border-radius: 12px;
-    background: #fff;
-    z-index: -1;
+.city-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
 }
 
-/* Hover */
-.add-city-btn:hover{
-    color: #000000;
-    transform: translateY(-3px);
-    box-shadow: 0 15px 35px rgba(34,197,94,.25);
-}
-
-
-/* Click */
-.add-city-btn:active{
-    transform: scale(.97);
-    box-shadow: 0 8px 20px rgba(22,163,74,.35);
-}
-
-/* Focus */
-.add-city-btn:focus{
-    outline: none;
-    box-shadow:
-        0 0 0 4px rgba(34,197,94,.18),
-        0 15px 35px rgba(22,163,74,.25);
-}
-
-/*==============================
-MODAL
-==============================*/
-
-.city-modal{
-
-    position:fixed;
-    inset:0;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-
-    background:rgba(15,23,42,.55);
-    backdrop-filter:blur(8px);
-
-    z-index:1000;
-    padding:20px;
-
-}
-
-/*==============================
-CARD
-==============================*/
-
-.city-modal-card{
-
-    position:relative;
-    width:450px;
-    max-width:95%;
-    border-radius:24px;
-    padding:2px;
-
-}
-
-.city-modal-card::before{
-
-    content:"";
-    position:absolute;
-    inset:0;
-    border-radius:24px;
-
-    background:linear-gradient(
-        135deg,
-        #2563EB,
-        #3B82F6,
-        #10B981,
-        #06B6D4,
-        #2563EB
-    );
-
-    background-size:300% 300%;
-    animation:borderMove 7s linear infinite;
-
-}
-
-.city-modal-inner{
-
-    position:relative;
-    background:#fff;
-    border-radius:22px;
-    overflow:hidden;
-
-}
-
-/*==============================
-HEADER
-==============================*/
-
-.city-modal-header{
-
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-
-    padding:20px 24px;
-
-    background:#F8FAFC;
-    border-bottom:1px solid #E2E8F0;
-
-}
-
-.city-modal-header h2{
-
-    margin:0;
-    color:#1E293B;
-    font-size:22px;
-
-}
-
-.city-close-icon{
-
-    width:38px;
-    height:38px;
-
-    border:none;
-    border-radius:50%;
-
-    background:#fff;
-    color:#64748B;
-
-    cursor:pointer;
-    font-size:18px;
-
-    transition:.3s;
-
-}
-
-.city-close-icon:hover{
-
-    background:#EF4444;
-    color:#fff;
-
-}
-
-/*==============================
-BODY
-==============================*/
-
-.city-modal-body{
-
-    padding:25px;
-
-}
-
-/*==============================
-INPUT
-==============================*/
-
-.city-input{
-
-    width:100%;
-    padding:14px 16px;
-    margin-bottom:18px;
-
-    border:2px solid #E2E8F0;
-    border-radius:14px;
-
-    font-size:15px;
-    background:#fff;
-
-    outline:none;
-    transition:.35s;
-
-    box-sizing:border-box;
-
-}
-
-.city-input:focus{
-
-    border-color:#2563EB;
-    box-shadow:0 0 0 4px rgba(37,99,235,.12);
-
-}
-
-/*==============================
-BUTTON GROUP
-==============================*/
-
-.city-button-group{
-
-    display:flex;
-    gap:15px;
-    margin-top:10px;
-
-}
-
-/*==============================
-SAVE BUTTON
-==============================*/
-
-.city-save-btn{
-
-    flex:1;
-
-    padding:14px;
-
-    background:#fff;
-    color:#10B981;
-
-    border:2px solid transparent;
-    border-radius:14px;
-
-    cursor:pointer;
-    font-weight:600;
-
-    background-image:
-        linear-gradient(#fff,#fff),
-        linear-gradient(
-            135deg,
-            #10B981,
-            #22C55E,
-            #06B6D4
-        );
-
-    background-origin:border-box;
-    background-clip:padding-box,border-box;
-
-    transition:.35s;
-
-}
-
-.city-save-btn:hover{
-
-    background:#10B981;
-    color:#fff;
-    border-color:#10B981;
-
-    transform:translateY(-2px);
-    box-shadow:0 15px 30px rgba(16,185,129,.25);
-
-}
-
-/*==============================
-CANCEL BUTTON
-==============================*/
-
-.city-cancel-btn{
-
-    flex:1;
-
-    padding:14px;
-
-    background:#fff;
-    color:#EF4444;
-
-    border:2px solid transparent;
-    border-radius:14px;
-
-    cursor:pointer;
-    font-weight:600;
-
-    background-image:
-        linear-gradient(#fff,#fff),
-        linear-gradient(
-            135deg,
-            #EF4444,
-            #F87171
-        );
-
-    background-origin:border-box;
-    background-clip:padding-box,border-box;
-
-    transition:.35s;
-
-}
-
-.city-cancel-btn:hover{
-
-    background:#EF4444;
-    color:#fff;
-    border-color:#EF4444;
-
-    transform:translateY(-2px);
-    box-shadow:0 15px 30px rgba(239,68,68,.25);
-
-}
-
-/*==============================
-ANIMATION
-==============================*/
-
-@keyframes borderMove{
-
-    0%{
-        background-position:0% 50%;
-    }
-
-    50%{
-        background-position:100% 50%;
-    }
-
-    100%{
-        background-position:0% 50%;
-    }
-
-}
-
-/*==============================
-RESPONSIVE
-==============================*/
-
-@media(max-width:768px){
-
-    .city-modal-card{
-
-        width:100%;
-
-    }
-
-    .city-button-group{
-
-        flex-direction:column;
-
-    }
-
+.city-modal-box {
+  background: var(--bg-secondary, #ffffff);
+  border-radius: 20px;
+  padding: 24px 28px;
+  width: 440px;
+  max-width: 95%;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-color, #e2e8f0);
 }

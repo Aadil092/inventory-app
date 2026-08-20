@@ -1,14 +1,32 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react'
-import "./CustomerProfile.css"
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import {
+  FaUser,
+  FaEnvelope,
+  FaMapMarkerAlt,
+  FaLock,
+  FaKey,
+  FaShieldAlt,
+  FaCheck,
+  FaSave,
+  FaTimes,
+  FaEye,
+  FaEyeSlash,
+} from "react-icons/fa";
+import "./CustomerProfile.css";
+
+const API_BASE = "http://localhost:5000/api";
+const getToken = () => localStorage.getItem("pos-token");
+const headers = () => ({
+  headers: { Authorization: `Bearer ${getToken()}` },
+});
 
 const CustomerProfile = () => {
-   const [user, setUser] = useState({
-       name: "",
-       email: "",
-       address: "",
-       password: "",
-});
+  const [user, setUser] = useState({
+    name: "",
+    email: "",
+    address: "",
+  });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
 
@@ -17,31 +35,28 @@ const CustomerProfile = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [verifyLoading, setVerifyLoading] = useState(false);
 
-  // Update password modal
+  // Update password state
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [showOldPass, setShowOldPass] = useState(false);
+  const [showNewPass, setShowNewPass] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
 
-   const fetchUser = async () => {
+  const fetchUser = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/api/users/profile", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
-        },
-      });
-       
-      if(response.data.success) {
+      const response = await axios.get(`${API_BASE}/users/profile`, headers());
+      if (response.data.success) {
         setUser({
-          name: response.data.user.name,
-          email: response.data.user.email,
-          address: response.data.user.address,
-          password: "",
+          name: response.data.user.name || "",
+          email: response.data.user.email || "",
+          address: response.data.user.address || "",
         });
-        setLoading(false);
       }
     } catch (error) {
+      console.error("Error fetching profile:", error);
+    } finally {
       setLoading(false);
     }
   };
@@ -50,7 +65,6 @@ const CustomerProfile = () => {
     fetchUser();
   }, []);
 
-  // Handle profile form submit - open verify modal
   const handleProfileSubmit = (e) => {
     e.preventDefault();
     setMessage({ type: "", text: "" });
@@ -58,549 +72,305 @@ const CustomerProfile = () => {
     setShowVerifyModal(true);
   };
 
-  // Handle verify password and update profile
   const handleVerifySubmit = async (e) => {
     e.preventDefault();
     if (!currentPassword) {
-      setMessage({ type: "error", text: "Please enter your current password" });
+      setMessage({ type: "error", text: "Please enter your current password." });
       return;
     }
     setVerifyLoading(true);
-    setMessage({ type: "", text: "" });
     try {
       const response = await axios.put(
-        "http://localhost:5000/api/users/profile",
+        `${API_BASE}/users/profile`,
         {
           name: user.name,
           email: user.email,
           address: user.address,
           currentPassword,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
-          },
-        }
+        headers()
       );
       if (response.data.success) {
-        setMessage({ type: "success", text: response.data.message });
+        setMessage({ type: "success", text: "Profile updated successfully!" });
         setShowVerifyModal(false);
         setCurrentPassword("");
       }
     } catch (error) {
-      const errMsg = error.response?.data?.message || "Error updating profile";
+      const errMsg = error.response?.data?.message || "Failed to update profile";
       setMessage({ type: "error", text: errMsg });
     } finally {
       setVerifyLoading(false);
     }
   };
 
-  // Handle password update
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     if (!oldPassword || !newPassword) {
-      setMessage({ type: "error", text: "Please fill in both password fields" });
+      setMessage({ type: "error", text: "Please fill in all password fields." });
       return;
     }
     setPasswordLoading(true);
-    setMessage({ type: "", text: "" });
     try {
       const response = await axios.put(
-        "http://localhost:5000/api/users/profile/password",
+        `${API_BASE}/users/profile/password`,
         { oldPassword, newPassword },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
-          },
-        }
+        headers()
       );
       if (response.data.success) {
-        setMessage({ type: "success", text: response.data.message });
+        setMessage({ type: "success", text: "Password changed successfully!" });
         setShowPasswordModal(false);
         setOldPassword("");
         setNewPassword("");
       }
     } catch (error) {
-      const errMsg = error.response?.data?.message || "Error updating password";
+      const errMsg = error.response?.data?.message || "Failed to change password";
       setMessage({ type: "error", text: errMsg });
     } finally {
       setPasswordLoading(false);
     }
   };
 
+  if (loading) {
+    return (
+      <div className="profile-loading-state">
+        <div className="profile-spinner"></div>
+        <span>Loading Profile Details...</span>
+      </div>
+    );
+  }
+
   return (
-//      <div
-//         style={{
-//           width: "30%",
-//           background: "#fff",
-//           borderRadius: "16px",
-//           padding: "25px",
-//           boxShadow: "0 10px 30px rgba(0,0,0,.08)",
-//           border: "1px solid #E2E8F0",
-//         }}
-//       >
-//         <div
-//           style={{
-//             width: "100%",
-//             maxWidth: "480px",
-//             background: "#FFFFFF",
-//             borderRadius: "18px",
-//             overflow: "hidden",
-//             boxShadow: "0 15px 40px rgba(15,23,42,.12)",
-//             border: "1px solid #E2E8F0",
-//             fontFamily: "'Poppins', sans-serif",
-//           }}
-//         >
-//           {/* Header */}
-//           <div
-//             style={{
-//               background: "linear-gradient(135deg,#2563EB,#3B82F6)",
-//               padding: "25px",
-//               textAlign: "center",
-//               color: "#fff",
-//             }}
-//           >
-//             <div
-//               style={{
-//                 width: "65px",
-//                 height: "65px",
-//                 borderRadius: "50%",
-//                 background: "rgba(255,255,255,.18)",
-//                 display: "flex",
-//                 justifyContent: "center",
-//                 alignItems: "center",
-//                 margin: "0 auto 15px",
-//                 fontSize: "30px",
-//               }}
-//             >
-//               👤
-//             </div>
+    <div className="profile-module-root">
+      <div className="module-header-row">
+        <div>
+          <h2 className="module-title">Account & Security</h2>
+          <p className="module-subtitle">Manage personal information, contact address, and authentication</p>
+        </div>
+      </div>
 
-//             <h2
-//               style={{
-//                 margin: 0,
-//                 fontSize: "26px",
-//                 fontWeight: "700",
-//               }}
-//             >
-//               Edit Profile
-//             </h2>
+      {message.text && (
+        <div className={`profile-alert-box ${message.type}`}>
+          <span>{message.type === "success" ? "✅" : "⚠️"}</span>
+          <span>{message.text}</span>
+          <button className="alert-close" onClick={() => setMessage({ type: "", text: "" })}>✕</button>
+        </div>
+      )}
 
-//             <p
-//               style={{
-//                 marginTop: "8px",
-//                 opacity: ".9",
-//                 fontSize: "14px",
-//               }}
-//             >
-//               Manage your profile information
-//             </p>
-//           </div>
+      <div className="profile-dual-cards">
+        {/* ─── Profile Details Card ─────────────────────────── */}
+        <div className="profile-card-item">
+          <div className="profile-card-header">
+            <div className="profile-header-avatar">
+              <FaUser />
+            </div>
+            <div>
+              <h3>Personal Details</h3>
+              <p>Update your public username, email, and billing address</p>
+            </div>
+          </div>
 
-//           {/* Success/Error Message */}
-//           {message.text && (
-//             <div style={{ padding: "0 20px", marginTop: "15px" }}>
-//               <div style={message.type === "success" ? successMsg : errorMsg}>
-//                 {message.text}
-//               </div>
-//             </div>
-//           )}
-
-//           {/* Form */}
-//           <form onSubmit={handleProfileSubmit} style={{ marginBottom: "20px", padding: "0 20px" }}>
-//               <input
-//                 type="text"
-//                 name="name"
-//                 value={user.name}   
-//                 onChange={(e) => setUser({...user, name: e.target.value})} 
-//                 placeholder="Name"
-//                 style={inputStyle}
-//               />
-//               <input
-//                 type="text"
-//                 name="email"
-//                 value={user.email}
-//                 onChange={(e) => setUser({...user, email: e.target.value})}
-//                 placeholder="Email"
-//                 style={inputStyle}
-//               />
-//               <input
-//                 type="text"
-//                 name="number"
-//                 value={user.address}
-//                 onChange={(e) => setUser({...user, address: e.target.value})}
-//                 placeholder="Address"
-//                 style={inputStyle}
-//               />
-
-//               <button
-//                 type="submit"
-//                 style={{
-//                   flex: 1,
-//                   width: "100%",
-//                   background: "linear-gradient(135deg,#2563EB,#3B82F6)",
-//                   color: "#fff",
-//                   border: "none",
-//                   padding: "14px",
-//                   borderRadius: "12px",
-//                   cursor: "pointer",
-//                   fontWeight: "600",
-//                   fontSize: "15px",
-//                   transition: ".3s",
-//                   boxShadow: "0 8px 20px rgba(37,99,235,.25)",
-//                 }}
-//                 onMouseOver={(e) =>
-//                 (e.target.style.transform = "translateY(-2px)")
-//                 }
-//                 onMouseOut={(e) =>
-//                 (e.target.style.transform = "translateY(0)")
-//                 }
-//               >
-//                Edit Profile
-//               </button>
-//             </form>
-
-//             {/* Update Password Button */}
-//             <div style={{ padding: "0 20px 20px" }}>
-//               <button
-//                 type="button"
-//                 onClick={() => {
-//                   setMessage({ type: "", text: "" });
-//                   setOldPassword("");
-//                   setNewPassword("");
-//                   setShowPasswordModal(true);
-//                 }}
-//                 style={{
-//                   width: "100%",
-//                   background: "transparent",
-//                   color: "#2563EB",
-//                   border: "2px solid #2563EB",
-//                   padding: "14px",
-//                   borderRadius: "12px",
-//                   cursor: "pointer",
-//                   fontWeight: "600",
-//                   fontSize: "15px",
-//                   transition: ".3s",
-//                 }}
-//                 onMouseOver={(e) => {
-//                   e.target.style.background = "#2563EB";
-//                   e.target.style.color = "#fff";
-//                 }}
-//                 onMouseOut={(e) => {
-//                   e.target.style.background = "transparent";
-//                   e.target.style.color = "#2563EB";
-//                 }}
-//               >
-//                 Update Password
-//               </button>
-//             </div>
-
-//       </div>
-
-//       {/* Verify Password Modal */}
-//       {showVerifyModal && (
-//         <div style={modalOverlay} onClick={() => setShowVerifyModal(false)}>
-//           <div style={modalBox} onClick={(e) => e.stopPropagation()}>
-//             <button style={closeBtn} onClick={() => setShowVerifyModal(false)}>✕</button>
-//             <h3 style={modalTitle}>Verify Password</h3>
-//             <p style={{ color: "#64748B", marginBottom: "15px", fontSize: "14px" }}>
-//               Please enter your current password to save profile changes.
-//             </p>
-//             <form onSubmit={handleVerifySubmit}>
-//               <input
-//                 type="password"
-//                 placeholder="Current Password"
-//                 value={currentPassword}
-//                 onChange={(e) => setCurrentPassword(e.target.value)}
-//                 style={modalInput}
-//                 autoFocus
-//               />
-//               <button type="submit" style={modalBtn} disabled={verifyLoading}>
-//                 {verifyLoading ? "Verifying..." : "Confirm & Save"}
-//               </button>
-//             </form>
-//           </div>
-//         </div>
-//       )}
-
-//       {/* Update Password Modal */}
-//       {showPasswordModal && (
-//         <div style={modalOverlay} onClick={() => setShowPasswordModal(false)}>
-//           <div style={modalBox} onClick={(e) => e.stopPropagation()}>
-//             <button style={closeBtn} onClick={() => setShowPasswordModal(false)}>✕</button>
-//             <h3 style={modalTitle}>Update Password</h3>
-//             <form onSubmit={handlePasswordSubmit}>
-//               <input
-//                 type="password"
-//                 placeholder="Old Password"
-//                 value={oldPassword}
-//                 onChange={(e) => setOldPassword(e.target.value)}
-//                 style={modalInput}
-//                 autoFocus
-//               />
-//               <input
-//                 type="password"
-//                 placeholder="New Password"
-//                 value={newPassword}
-//                 onChange={(e) => setNewPassword(e.target.value)}
-//                 style={modalInput}
-//               />
-//               <button type="submit" style={modalBtn} disabled={passwordLoading}>
-//                 {passwordLoading ? "Updating..." : "Update Password"}
-//               </button>
-//             </form>
-//           </div>
-//         </div>
-//       )}
-// </div>
-<div className="profile-wrapper">
-
-    <div className="profile-card">
-
-        {/* Header */}
-
-        <div className="profile-header">
-
-            <div className="profile-avatar">
-                👤
+          <form onSubmit={handleProfileSubmit} className="profile-form-grid">
+            <div className="profile-field-group">
+              <label>Full Name</label>
+              <div className="profile-input-wrapper">
+                <FaUser className="input-icon" />
+                <input
+                  type="text"
+                  value={user.name}
+                  onChange={(e) => setUser({ ...user, name: e.target.value })}
+                  placeholder="Enter full name"
+                  required
+                />
+              </div>
             </div>
 
-            <h2>Edit Profile</h2>
+            <div className="profile-field-group">
+              <label>Email Address</label>
+              <div className="profile-input-wrapper">
+                <FaEnvelope className="input-icon" />
+                <input
+                  type="email"
+                  value={user.email}
+                  onChange={(e) => setUser({ ...user, email: e.target.value })}
+                  placeholder="Enter email address"
+                  required
+                />
+              </div>
+            </div>
 
-            <p>
-                Manage your profile information
+            <div className="profile-field-group">
+              <label>Delivery / Billing Address</label>
+              <div className="profile-input-wrapper">
+                <FaMapMarkerAlt className="input-icon" />
+                <textarea
+                  rows="3"
+                  value={user.address}
+                  onChange={(e) => setUser({ ...user, address: e.target.value })}
+                  placeholder="Street address, City, Postal Code"
+                />
+              </div>
+            </div>
+
+            <button type="submit" className="profile-submit-btn">
+              <FaSave /> Save Profile Changes
+            </button>
+          </form>
+        </div>
+
+        {/* ─── Security & Password Card ─────────────────────── */}
+        <div className="profile-card-item">
+          <div className="profile-card-header">
+            <div className="profile-header-avatar amber">
+              <FaShieldAlt />
+            </div>
+            <div>
+              <h3>Security & Password</h3>
+              <p>Protect your account with a strong and secure password</p>
+            </div>
+          </div>
+
+          <div className="security-card-content">
+            <div className="security-notice-box">
+              <FaLock className="lock-icon" />
+              <div>
+                <strong>Keep Your Password Secure</strong>
+                <p>Change your password periodically to ensure your inventory and order data remain safe.</p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="open-password-modal-btn"
+              onClick={() => {
+                setMessage({ type: "", text: "" });
+                setOldPassword("");
+                setNewPassword("");
+                setShowPasswordModal(true);
+              }}
+            >
+              <FaKey /> Update Password
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ─── Verify Password Modal ───────────────────────────── */}
+      {showVerifyModal && (
+        <div className="profile-modal-overlay" onClick={() => setShowVerifyModal(false)}>
+          <div className="profile-modal-box" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header-line">
+              <div className="modal-heading">
+                <FaShieldAlt className="modal-header-icon blue" />
+                <h3>Verify Password</h3>
+              </div>
+              <button className="modal-close-x" onClick={() => setShowVerifyModal(false)}>✕</button>
+            </div>
+
+            <p className="modal-instruction-text">
+              Please enter your current account password to confirm and save your profile changes.
             </p>
 
-        </div>
-
-        {/* Success / Error */}
-
-        {message.text && (
-
-            <div className="profile-message">
-
-                <div
-                    className={
-                        message.type === "success"
-                            ? "success-message"
-                            : "error-message"
-                    }
-                >
-                    {message.text}
+            <form onSubmit={handleVerifySubmit} className="modal-form-content">
+              <div className="profile-field-group">
+                <label>Current Password</label>
+                <div className="profile-input-wrapper">
+                  <FaLock className="input-icon" />
+                  <input
+                    type="password"
+                    placeholder="Enter current password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    required
+                    autoFocus
+                  />
                 </div>
+              </div>
 
+              <div className="modal-actions-row">
+                <button type="submit" className="modal-primary-btn" disabled={verifyLoading}>
+                  {verifyLoading ? "Verifying..." : "Confirm & Save"}
+                </button>
+                <button type="button" className="modal-secondary-btn" onClick={() => setShowVerifyModal(false)}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Change Password Modal ──────────────────────────── */}
+      {showPasswordModal && (
+        <div className="profile-modal-overlay" onClick={() => setShowPasswordModal(false)}>
+          <div className="profile-modal-box" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header-line">
+              <div className="modal-heading">
+                <FaKey className="modal-header-icon amber" />
+                <h3>Change Password</h3>
+              </div>
+              <button className="modal-close-x" onClick={() => setShowPasswordModal(false)}>✕</button>
             </div>
 
-        )}
+            <form onSubmit={handlePasswordSubmit} className="modal-form-content">
+              <div className="profile-field-group">
+                <label>Old Password</label>
+                <div className="profile-input-wrapper">
+                  <FaLock className="input-icon" />
+                  <input
+                    type={showOldPass ? "text" : "password"}
+                    placeholder="Enter current password"
+                    value={oldPassword}
+                    onChange={(e) => setOldPassword(e.target.value)}
+                    required
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    className="pass-peek-btn"
+                    onClick={() => setShowOldPass(!showOldPass)}
+                    tabIndex="-1"
+                  >
+                    {showOldPass ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
+              </div>
 
-        {/* Form */}
+              <div className="profile-field-group">
+                <label>New Password</label>
+                <div className="profile-input-wrapper">
+                  <FaLock className="input-icon" />
+                  <input
+                    type={showNewPass ? "text" : "password"}
+                    placeholder="Create a strong new password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="pass-peek-btn"
+                    onClick={() => setShowNewPass(!showNewPass)}
+                    tabIndex="-1"
+                  >
+                    {showNewPass ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
+              </div>
 
-        <form
-            className="profile-form"
-            onSubmit={handleProfileSubmit}
-        >
-
-            <input
-                className="profile-input"
-                type="text"
-                name="name"
-                value={user.name}
-                onChange={(e) =>
-                    setUser({
-                        ...user,
-                        name: e.target.value,
-                    })
-                }
-                placeholder="Name"
-            />
-
-            <input
-                className="profile-input"
-                type="text"
-                name="email"
-                value={user.email}
-                onChange={(e) =>
-                    setUser({
-                        ...user,
-                        email: e.target.value,
-                    })
-                }
-                placeholder="Email"
-            />
-
-            <input
-                className="profile-input"
-                type="text"
-                name="address"
-                value={user.address}
-                onChange={(e) =>
-                    setUser({
-                        ...user,
-                        address: e.target.value,
-                    })
-                }
-                placeholder="Address"
-            />
-
-            <button
-                type="submit"
-                className="profile-save-btn"
-            >
-                Edit Profile
-            </button>
-
-        </form>
-
-        {/* Update Password */}
-
-        <div className="password-section">
-
-            <button
-                type="button"
-                className="password-btn"
-                onClick={() => {
-                    setMessage({ type: "", text: "" });
-                    setOldPassword("");
-                    setNewPassword("");
-                    setShowPasswordModal(true);
-                }}
-            >
-                Update Password
-            </button>
-
+              <div className="modal-actions-row">
+                <button type="submit" className="modal-primary-btn" disabled={passwordLoading}>
+                  {passwordLoading ? "Updating..." : "Update Password"}
+                </button>
+                <button type="button" className="modal-secondary-btn" onClick={() => setShowPasswordModal(false)}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-
+      )}
     </div>
+  );
+};
 
-    {/* Verify Password Modal */}
-
-    {showVerifyModal && (
-
-        <div
-            className="modal-overlay"
-            onClick={() => setShowVerifyModal(false)}
-        >
-
-            <div
-                className="modal-box"
-                onClick={(e) => e.stopPropagation()}
-            >
-
-                <button
-                    className="close-btn"
-                    onClick={() => setShowVerifyModal(false)}
-                >
-                    ✕
-                </button>
-
-                <h3 className="modal-title">
-                    Verify Password
-                </h3>
-
-                <p className="modal-description">
-                    Please enter your current password to save profile changes.
-                </p>
-
-                <form onSubmit={handleVerifySubmit}>
-
-                    <input
-                        className="modal-input"
-                        type="password"
-                        placeholder="Current Password"
-                        value={currentPassword}
-                        onChange={(e) =>
-                            setCurrentPassword(e.target.value)
-                        }
-                        autoFocus
-                    />
-
-                    <button
-                        type="submit"
-                        className="modal-btn"
-                        disabled={verifyLoading}
-                    >
-                        {verifyLoading
-                            ? "Verifying..."
-                            : "Confirm & Save"}
-                    </button>
-
-                </form>
-
-            </div>
-
-        </div>
-
-    )}
-
-    {/* Update Password Modal */}
-
-    {showPasswordModal && (
-
-        <div
-            className="modal-overlay"
-            onClick={() => setShowPasswordModal(false)}
-        >
-
-            <div
-                className="modal-box"
-                onClick={(e) => e.stopPropagation()}
-            >
-
-                <button
-                    className="close-btn"
-                    onClick={() => setShowPasswordModal(false)}
-                >
-                    ✕
-                </button>
-
-                <h3 className="modal-title">
-                    Update Password
-                </h3>
-
-                <form onSubmit={handlePasswordSubmit}>
-
-                    <input
-                        className="modal-input"
-                        type="password"
-                        placeholder="Old Password"
-                        value={oldPassword}
-                        onChange={(e) =>
-                            setOldPassword(e.target.value)
-                        }
-                        autoFocus
-                    />
-
-                    <input
-                        className="modal-input"
-                        type="password"
-                        placeholder="New Password"
-                        value={newPassword}
-                        onChange={(e) =>
-                            setNewPassword(e.target.value)
-                        }
-                    />
-
-                    <button
-                        type="submit"
-                        className="modal-btn"
-                        disabled={passwordLoading}
-                    >
-                        {passwordLoading
-                            ? "Updating..."
-                            : "Update Password"}
-                    </button>
-
-                </form>
-
-            </div>
-
-        </div>
-
-    )}
-
-</div>
-  )
-}
-
-export default CustomerProfile
-
+export default CustomerProfile;

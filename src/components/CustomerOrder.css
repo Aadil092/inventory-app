@@ -1,258 +1,159 @@
-/* =========================================
-   CUSTOMER ORDERS PAGE
-========================================= */
+/* =========================================================
+   CUSTOMER ORDER COMPONENT STYLES - MODERN ENTERPRISE UI
+============================================================ */
 
-.customer-orders-page{
-    width:100%;
-    padding:25px;
-    background:#F8FAFC;
-    min-height:100vh;
+.customer-order-root {
+  width: 100%;
 }
 
-/* =========================================
-   TITLE
-========================================= */
-
-.orders-title{
-    font-size:28px;
-    font-weight:700;
-    color:#1E293B;
-    margin-bottom:20px;
+.customer-orders-table-card {
+  background: var(--bg-secondary, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 20px;
+  padding: 20px 24px;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.04);
 }
 
-/* =========================================
-   SEARCH BOX
-========================================= */
-
-.orders-search-box{
-    margin-bottom:25px;
+.cust-orders-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
 }
 
-.orders-search-input{
-    width:100%;
-    padding:14px 18px;
-    border:2px solid #E2E8F0;
-    border-radius:12px;
-    background:#fff;
-    font-size:15px;
-    color:#334155;
-    outline:none;
-    transition:.3s;
-    box-sizing:border-box;
+.cust-orders-data-table th {
+  text-align: left;
+  padding: 12px 14px;
+  color: var(--text-muted, #64748b);
+  border-bottom: 1.5px solid var(--border-color, #e2e8f0);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
 }
 
-.orders-search-input:focus{
-    border-color:#2563EB;
-    box-shadow:0 0 0 4px rgba(37,99,235,.12);
+.cust-orders-data-table td {
+  padding: 14px;
+  border-bottom: 1px solid var(--border-color, #f1f5f9);
+  color: var(--text-main, #0f172a);
+  vertical-align: middle;
 }
 
-.orders-search-input::placeholder{
-    color:#94A3B8;
+.cust-orders-data-table tbody tr:hover {
+  background: rgba(37, 99, 235, 0.03);
 }
 
-/* =========================================
-   TABLE CARD
-========================================= */
-
-.customer-orders-table-card{
-    background:#fff;
-    border-radius:18px;
-    padding:20px;
-    overflow-x:auto;
-    border:1px solid #E2E8F0;
-    box-shadow:0 10px 30px rgba(15,23,42,.08);
+/* Tracking Stepper */
+.tracking-stepper-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0 26px;
+  position: relative;
 }
 
-/* =========================================
-   TABLE
-========================================= */
-
-.customer-orders-table{
-    width:100%;
-    min-width:950px;
-    border-collapse:collapse;
+.stepper-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 1;
 }
 
-/* =========================================
-   HEADER
-========================================= */
-
-.customer-orders-table thead{
-    background:#F8FAFC;
+.step-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--bg-primary, #f1f5f9);
+  color: var(--text-muted, #94a3b8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  border: 2px solid var(--border-color, #cbd5e1);
+  z-index: 2;
+  transition: all 0.3s;
 }
 
-.customer-orders-table th{
-    color:#000000;
-    padding:18px;
-    text-align:left;
-    font-size:15px;
-    font-weight:600;
-    white-space:nowrap;
+.stepper-step.completed .step-circle {
+  background: #10b981;
+  color: #ffffff;
+  border-color: #10b981;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
-/* =========================================
-   BODY
-========================================= */
-
-.customer-orders-table td{
-    padding:18px;
-    border-bottom:1px solid #EEF2F7;
-    color:#475569;
-    vertical-align:middle;
+.stepper-step.current .step-circle {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  animation: pulse 1.8s infinite;
 }
 
-.customer-orders-table tbody tr{
-    transition:.3s;
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
 }
 
-.customer-orders-table tbody tr:hover{
-    background:#F8FAFC;
+.step-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted, #64748b);
+  margin-top: 8px;
 }
 
-/* =========================================
-   ID CIRCLE
-========================================= */
-
-.order-id-circle{
-    width:38px;
-    height:38px;
-    border-radius:50%;
-    background:#DBEAFE;
-    color:#2563EB;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-weight:700;
+.stepper-step.completed .step-name,
+.stepper-step.current .step-name {
+  color: var(--text-main, #0f172a);
 }
 
-/* =========================================
-   PRODUCT
-========================================= */
-
-.order-product{
-    font-weight:600;
-    color:#0F172A;
+.step-connector {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  width: 100%;
+  height: 3px;
+  background: var(--border-color, #e2e8f0);
+  z-index: 1;
 }
 
-/* =========================================
-   QUANTITY BADGE
-========================================= */
-
-.qty-badge{
-    display:inline-block;
-    padding:7px 14px;
-    border-radius:30px;
-    background:#DBEAFE;
-    color:#2563EB;
-    font-weight:600;
+.step-connector.active {
+  background: #10b981;
 }
 
-/* =========================================
-   PRICE
-========================================= */
-
-.order-price{
-    color:#16A34A;
-    font-weight:700;
-    font-size:16px;
+.cancelled-banner-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 14px;
+  margin-bottom: 20px;
+  color: #b91c1c;
 }
 
-/* =========================================
-   ADDRESS
-========================================= */
-
-.order-address{
-    max-width:250px;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
+.cancelled-icon {
+  font-size: 24px;
+  color: #ef4444;
+  flex-shrink: 0;
 }
 
-/* =========================================
-   PAYMENT BADGE
-========================================= */
-
-.payment-badge{
-    display:inline-block;
-    padding:7px 14px;
-    border-radius:30px;
-    font-size:13px;
-    font-weight:600;
+.cancelled-banner-box strong {
+  display: block;
+  font-size: 14px;
 }
 
-.payment-online{
-    background:#DBEAFE;
-    color:#2563EB;
+.cancelled-banner-box p {
+  margin: 2px 0 0 0;
+  font-size: 12px;
 }
 
-.payment-cash{
-    background:#DCFCE7;
-    color:#15803D;
-}
-
-/* =========================================
-   ACTION BUTTONS
-========================================= */
-
-.order-action-buttons{
-    text-align:center;
-}
-
-.delete-order-btn{
-    padding:10px 18px;
-    border:2px solid #EF4444;
-    border-radius:12px;
-    background:#fff;
-    color:#EF4444;
-    font-weight:600;
-    cursor:pointer;
-    transition:.3s;
-}
-
-.delete-order-btn:hover{
-    background:#EF4444;
-    color:#fff;
-    transform:translateY(-2px);
-    box-shadow:0 10px 22px rgba(239,68,68,.25);
-}
-
-/* =========================================
-   EMPTY STATE
-========================================= */
-
-.empty-order{
-    padding:40px;
-    text-align:center;
-    color:#64748B;
-    font-size:16px;
-    font-weight:500;
-}
-
-/* =========================================
-   RESPONSIVE
-========================================= */
-
-@media(max-width:992px){
-
-    .customer-orders-table{
-        min-width:900px;
-    }
-
-}
-
-@media(max-width:768px){
-
-    .customer-orders-page{
-        padding:15px;
-    }
-
-    .orders-title{
-        font-size:24px;
-    }
-
-    .customer-orders-table th,
-    .customer-orders-table td{
-        padding:14px;
-    }
-
+.track-modal-card {
+  background: var(--bg-secondary, #ffffff);
+  border-radius: 20px;
+  padding: 24px 28px;
+  width: 580px;
+  max-width: 95%;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-color, #e2e8f0);
 }
