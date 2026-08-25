@@ -15,6 +15,25 @@ const login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
+
+    // Check if user account is deactivated or blocked
+    const userStatus = (user.status || "Active").toLowerCase();
+    if (userStatus === "deactive" || userStatus === "inactive") {
+      return res.status(403).json({
+        success: false,
+        message: "Your account has been deactivated. Please contact the administrator to reactivate your account.",
+        accountStatus: "Deactive",
+      });
+    }
+
+    if (userStatus === "blocked") {
+      return res.status(403).json({
+        success: false,
+        message: "Your account has been blocked by the administrator. Access is restricted. Please contact support.",
+        accountStatus: "Blocked",
+      });
+    }
+
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET || "default_secret_key",
@@ -24,7 +43,7 @@ const login = async (req, res) => {
       success: true,
       message: "Login successful",
       token,
-      user: { id: user._id, name: user.name, email: user.email, role: user.role },
+      user: { id: user._id, name: user.name, email: user.email, role: user.role, status: user.status || "Active" },
     });
   } catch (error) {
     return res.status(500).json({ success: false, message: "Internal Server Error" });

@@ -284,7 +284,7 @@ const CustomerProduct = () => {
             />
           </div>
 
-          <div className="category-select-wrap">
+          <div className="form-field-group">
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
@@ -362,15 +362,14 @@ const CustomerProduct = () => {
 
                       <td>
                         <span
-                          className={`cust-stock-pill ${
-                            isZero ? "zero" : isLow ? "low" : "healthy"
-                          }`}
+                          className={`cust-stock-pill ${isZero ? "zero" : isLow ? "low" : "healthy"
+                            }`}
                         >
                           {isZero
                             ? "Out of Stock"
                             : isLow
-                            ? `${stockNum} Left (Low)`
-                            : `${stockNum} in Stock`}
+                              ? `${stockNum} Left (Low)`
+                              : `${stockNum} in Stock`}
                         </span>
                       </td>
 

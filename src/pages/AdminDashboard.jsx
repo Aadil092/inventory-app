@@ -63,7 +63,7 @@ export default function AdminDashboard() {
             <FaBoxOpen />
           </div>
           <div className="brand-text-group">
-            <h2 className="brand-name">Inventory Management System</h2>
+            <h2 className="brand-name">AI-Powered Inventory Management System</h2>
             <span className="brand-badge admin-badge">Admin Portal</span>
           </div>
         </div>
@@ -106,10 +106,17 @@ export default function AdminDashboard() {
       <div className="admin-main-wrapper">
         {/* Top Navbar */}
         <header className="admin-top-navbar">
-          <div className="navbar-breadcrumb">
-            <span className="breadcrumb-root">Admin Portal</span>
-            <span className="breadcrumb-separator">/</span>
-            <span className="breadcrumb-active">{getPageTitle()}</span>
+          <div className="navbar-left-group">
+            <div className="navbar-welcome-header">
+              <h1 className="navbar-welcome-title">
+                Welcome back, <span className="welcome-username">{user?.name?.toUpperCase() || "CUSTOMER"}</span>! 👋
+              </h1>
+            </div>
+            <div className="navbar-breadcrumb">
+              <span className="breadcrumb-root">Admin Portal</span>
+              <span className="breadcrumb-separator">/</span>
+              <span className="breadcrumb-active">{getPageTitle()}</span>
+            </div>
           </div>
 
           <div className="navbar-actions-group">

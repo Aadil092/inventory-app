@@ -22,12 +22,22 @@ const authMiddleware = async (req, res, next) => {
     if (!user) {
       return res.status(401).json({ success: false, message: "User not found" });
     }
+
+    const userStatus = (user.status || "Active").toLowerCase();
+    if (userStatus === "deactive" || userStatus === "inactive") {
+      return res.status(403).json({ success: false, message: "Your account is deactivated. Please contact the administrator." });
+    }
+
+    if (userStatus === "blocked") {
+      return res.status(403).json({ success: false, message: "Your account is blocked. Access denied." });
+    }
     
     req.user = {
-  id: user._id,
-  name: user.name,
-  role: user.role,
-};
+      id: user._id,
+      name: user.name,
+      role: user.role,
+      status: user.status || "Active",
+    };
     next();
   } catch (error) {
     console.error("Error in authMiddleware:", error);

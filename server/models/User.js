@@ -6,7 +6,8 @@ const userSchema = new mongoose.Schema({
     email: {type: String, required: true, unique: true},
     password: {type: String, required: true},
     address: {type: String},
-    role: {type: String, enum:["superadmin", "admin","customer"], default: "customer"}
+    role: {type: String, enum:["superadmin", "admin","customer"], default: "customer"},
+    status: {type: String, enum:["Active", "Deactive", "Blocked", "active", "deactive", "blocked"], default: "Active"}
 })
 
 const User = mongoose.model("User", userSchema);

@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 
 const addUser = async (req , res) => {
     try {
-        const { name, email, password, address, role} = req.body;
+        const { name, email, password, address, role, status } = req.body;
 
         const existingUser = await User.findOne({email});
         if (existingUser) {
@@ -19,6 +19,7 @@ const addUser = async (req , res) => {
          password: hashPassword,
          address,
          role,
+         status: status || "Active",
         });
 
         await newUser.save();
@@ -32,19 +33,25 @@ const addUser = async (req , res) => {
 const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, email, address, password, role } = req.body;
+        const { name, email, address, password, role, status } = req.body;
 
         const existingUser = await User.findById(id);
         if (!existingUser) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
 
+        // Prevent superadmin account from being deactivated or blocked
+        if (existingUser.role === 'superadmin' && status && status.toLowerCase() !== 'active') {
+            return res.status(400).json({ success: false, message: 'Superadmin account status cannot be deactivated or blocked.' });
+        }
+
         const updatedData = {
-            name: name || existingUser.name,
-            email: email || existingUser.email,
-            address: address || existingUser.address,
+            name: name !== undefined ? name : existingUser.name,
+            email: email !== undefined ? email : existingUser.email,
+            address: address !== undefined ? address : existingUser.address,
             password: existingUser.password, // Keep the existing password if not provided
-            role: role || existingUser.role,
+            role: role !== undefined ? role : existingUser.role,
+            status: status !== undefined ? status : (existingUser.status || "Active"),
         };
 
         if (password) {
@@ -52,7 +59,7 @@ const updateUser = async (req, res) => {
             updatedData.password = hashPassword;
         }
 
-        const updatedUser = await User.findByIdAndUpdate(id, updatedData, {returnDocument: 'after'});
+        const updatedUser = await User.findByIdAndUpdate(id, updatedData, {returnDocument: 'after'}).select('-password');
         return res.status(200).json({ success: true, message: 'User updated successfully', user: updatedUser });
     } catch (error) {
         console.error('Error updating user:', error);

@@ -281,16 +281,55 @@ body {
 /* Error Alert */
 .auth-error-alert {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 12px;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
   background: #fee2e2;
   border: 1px solid #fecaca;
-  border-radius: 10px;
+  border-radius: 12px;
   color: #b91c1c;
   font-size: 12px;
-  font-weight: 600;
+  line-height: 1.4;
   margin-bottom: 16px;
+  animation: shakeAlert 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes shakeAlert {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-3px, 0, 0); }
+  40%, 60% { transform: translate3d(3px, 0, 0); }
+}
+
+.auth-error-alert.blocked-alert {
+  background: #fef2f2;
+  border-color: #f87171;
+  color: #991b1b;
+}
+
+.auth-error-alert.deactive-alert {
+  background: #fffbeb;
+  border-color: #fcd34d;
+  color: #92400e;
+}
+
+.alert-badge-icon {
+  font-size: 16px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.alert-body strong {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 800;
+  margin-bottom: 2px;
+}
+
+.alert-body p {
+  margin: 0;
+  font-size: 11.5px;
+  opacity: 0.95;
 }
 
 /* Form Fields */

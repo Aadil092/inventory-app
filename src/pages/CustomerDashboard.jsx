@@ -48,7 +48,7 @@ export default function CustomerDashboard() {
             <FaBoxOpen />
           </div>
           <div className="brand-text-group">
-            <h2 className="brand-name">Inventory Management System</h2>
+            <h2 className="brand-name">AI-Powered Inventory Management System</h2>
             <span className="brand-badge customer-badge">Customer Portal</span>
           </div>
         </div>
@@ -90,10 +90,17 @@ export default function CustomerDashboard() {
       <div className="customer-main-wrapper">
         {/* Top Navbar */}
         <header className="customer-top-navbar">
-          <div className="navbar-breadcrumb">
-            <span className="breadcrumb-root">Customer Portal</span>
-            <span className="breadcrumb-separator">/</span>
-            <span className="breadcrumb-active">{getPageTitle()}</span>
+          <div className="navbar-left-group">
+            <div className="navbar-welcome-header">
+              <h1 className="navbar-welcome-title">
+                Welcome back, <span className="welcome-username">{user?.name || "Customer"}</span>! 👋
+              </h1>
+            </div>
+            <div className="navbar-breadcrumb">
+              <span className="breadcrumb-root">Customer Portal</span>
+              <span className="breadcrumb-separator">/</span>
+              <span className="breadcrumb-active">{getPageTitle()}</span>
+            </div>
           </div>
 
           <div className="navbar-actions-group">
@@ -121,7 +128,10 @@ export default function CustomerDashboard() {
               <div className="nav-avatar">
                 {user?.name?.charAt(0).toUpperCase() || "C"}
               </div>
-              <span className="nav-role-tag">Customer</span>
+              <div className="nav-profile-text">
+                <span className="nav-user-name">{user?.name || "Customer"}</span>
+                <span className="nav-role-tag">Customer</span>
+              </div>
             </div>
           </div>
         </header>

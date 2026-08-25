@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   FaBox,
+  FaBoxOpen,
   FaCog,
   FaCrown,
   FaHome,
@@ -65,9 +66,11 @@ export default function SuperAdmin() {
       <aside className="superadmin-sidebar">
         {/* Brand Header */}
         <div className="sidebar-brand-box">
-          <div className="brand-logo-icon crown-icon">👑</div>
+          <div className="brand-logo-icon">
+            <FaBoxOpen />
+          </div>
           <div className="brand-text-group">
-            <h2 className="brand-name">Inventory Management System</h2>
+            <h2 className="brand-name">AI-Powered Inventory Management System</h2>
             <span className="brand-badge crown-badge">Super Admin Portal</span>
           </div>
         </div>
@@ -110,10 +113,17 @@ export default function SuperAdmin() {
       <div className="superadmin-main-wrapper">
         {/* Top Navbar */}
         <header className="superadmin-top-navbar">
-          <div className="navbar-breadcrumb">
-            <span className="breadcrumb-root">Super Admin</span>
-            <span className="breadcrumb-separator">/</span>
-            <span className="breadcrumb-active">{getPageTitle()}</span>
+          <div className="navbar-left-group">
+            <div className="navbar-welcome-header">
+              <h1 className="navbar-welcome-title">
+                Welcome back, <span className="welcome-username">{user?.name?.toUpperCase() || "CUSTOMER"}</span>! 👋
+              </h1>
+            </div>
+            <div className="navbar-breadcrumb">
+              <span className="breadcrumb-root">Super admin</span>
+              <span className="breadcrumb-separator">/</span>
+              <span className="breadcrumb-active">{getPageTitle()}</span>
+            </div>
           </div>
 
           <div className="navbar-actions-group">

@@ -57,21 +57,33 @@
 }
 
 /* =========================================================
-   SIDEBAR
+   SIDEBAR (FIXED POSITION)
 ============================================================ */
 .superadmin-sidebar {
   width: 300px;
-  min-height: 100vh;
-  position: sticky;
+  height: 100vh;
+  position: fixed;
   top: 0;
+  left: 0;
+  bottom: 0;
   background-color: var(--bg-sidebar);
   border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 24px 18px;
-  z-index: 50;
+  z-index: 100;
+  overflow-y: auto;
   transition: all 0.3s ease;
+}
+
+.superadmin-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.superadmin-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 4px;
 }
 
 /* Brand Header */
@@ -252,9 +264,11 @@
 ============================================================ */
 .superadmin-main-wrapper {
   flex: 1;
+  margin-left: 300px;
   display: flex;
   flex-direction: column;
   min-width: 0;
+  min-height: 100vh;
   background-color: var(--bg-primary);
   transition: background-color 0.3s ease;
 }
@@ -398,9 +412,19 @@
 
   .superadmin-sidebar {
     width: 100%;
+    height: auto;
     min-height: auto;
     position: relative;
+    top: auto;
+    left: auto;
+    bottom: auto;
+    z-index: 50;
+    overflow-y: visible;
     padding: 16px;
+  }
+
+  .superadmin-main-wrapper {
+    margin-left: 0;
   }
 
   .sidebar-nav-list {

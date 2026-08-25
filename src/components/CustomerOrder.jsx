@@ -15,6 +15,7 @@ import {
   FaShoppingBag,
   FaMapMarkerAlt,
   FaReceipt,
+  FaFilePdf,
 } from "react-icons/fa";
 import "./CustomerOrder.css";
 
@@ -39,6 +40,7 @@ const CustomerOrder = () => {
   const [trackOrder, setTrackOrder] = useState(null);
   const [invoiceOrder, setInvoiceOrder] = useState(null);
   const [cancellingId, setCancellingId] = useState(null);
+  const [downloadingId, setDownloadingId] = useState(null);
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -93,195 +95,52 @@ const CustomerOrder = () => {
     window.print();
   };
 
-  const downloadInvoice = (order) => {
-    if (!order) return;
-    const invCode = `INV-${order._id?.slice(-8).toUpperCase()}`;
-    const invoiceHTML = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Invoice - ${invCode}</title>
-  <style>
-    @page { size: A4 portrait; margin: 8mm 12mm; }
-    * { box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      color: #1e293b;
-      margin: 0;
-      padding: 20px 25px;
-      background: #ffffff;
-    }
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      border-bottom: 2px solid #e2e8f0;
-      padding-bottom: 15px;
-    }
-    .brand-title {
-      font-size: 22px;
-      font-weight: 800;
-      color: #2563eb;
-      margin: 0;
-    }
-    .brand-sub {
-      color: #64748b;
-      font-size: 12px;
-      margin-top: 3px;
-    }
-    .inv-meta {
-      text-align: right;
-    }
-    .inv-title {
-      font-size: 20px;
-      font-weight: 800;
-      color: #0f172a;
-      margin: 0 0 4px 0;
-    }
-    .meta-row {
-      font-size: 12px;
-      color: #475569;
-      margin-bottom: 2px;
-    }
-    .grid {
-      display: flex;
-      justify-content: space-between;
-      margin: 16px 0;
-      gap: 20px;
-    }
-    .col {
-      flex: 1;
-      font-size: 12px;
-      line-height: 1.4;
-    }
-    .col h4 {
-      margin: 0 0 5px 0;
-      font-size: 11px;
-      text-transform: uppercase;
-      color: #64748b;
-      letter-spacing: 0.5px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 15px 0;
-    }
-    th {
-      background: #f8fafc;
-      text-align: left;
-      padding: 8px 12px;
-      font-size: 12px;
-      color: #334155;
-      border-bottom: 2px solid #cbd5e1;
-    }
-    td {
-      padding: 10px 12px;
-      border-bottom: 1px solid #e2e8f0;
-      font-size: 12px;
-      color: #334155;
-    }
-    .totals-wrap {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 10px;
-    }
-    .totals-box {
-      width: 240px;
-      font-size: 13px;
-    }
-    .t-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 4px 0;
-      color: #64748b;
-    }
-    .t-grand {
-      border-top: 2px solid #0f172a;
-      padding-top: 6px;
-      font-size: 15px;
-      font-weight: 800;
-      color: #0f172a;
-    }
-    .footer {
-      text-align: center;
-      margin-top: 25px;
-      border-top: 1px solid #e2e8f0;
-      padding-top: 10px;
-      color: #94a3b8;
-      font-size: 11px;
-    }
-  </style>
-</head>
-<body>
-  <div class="header">
-    <div>
-      <h1 class="brand-title">📦 INVENTORY OS</h1>
-      <div class="brand-sub">Customer Purchase Receipt & Invoice</div>
-    </div>
-    <div class="inv-meta">
-      <h2 class="inv-title">RECEIPT</h2>
-      <div class="meta-row"><strong>Receipt Ref:</strong> ${invCode}</div>
-      <div class="meta-row"><strong>Date:</strong> ${order.createdAt ? new Date(order.createdAt).toLocaleDateString() : new Date().toLocaleDateString()}</div>
-      <div class="meta-row"><strong>Status:</strong> ${order.status || "Pending"}</div>
-    </div>
-  </div>
+  const downloadPdfReceipt = async (order) => {
+    if (!order || !order._id) return;
+    const currentStatus = order.status || "Pending";
 
-  <div class="grid">
-    <div class="col">
-      <h4>Delivery Address</h4>
-      <div>${order.address || "Standard Delivery"}</div>
-    </div>
-    <div class="col">
-      <h4>Payment Mode</h4>
-      <div><strong>${(order.paymentId || "CASH").toUpperCase()}</strong></div>
-    </div>
-  </div>
+    if (currentStatus !== "Delivered") {
+      alert("Receipt download is only available after your order has been delivered.");
+      return;
+    }
 
-  <table>
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Product Description</th>
-        <th>Unit Price</th>
-        <th>Qty</th>
-        <th>Total Amount</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>1</td>
-        <td><strong>${order.productId?.name || "Product"}</strong></td>
-        <td>₹${Math.round((order.price || 0) / (order.quantity || 1)).toLocaleString()}</td>
-        <td>${order.quantity}</td>
-        <td>₹${Number(order.price || 0).toLocaleString()}</td>
-      </tr>
-    </tbody>
-  </table>
+    setDownloadingId(order._id);
+    try {
+      const response = await axios.get(`${API_BASE}/orders/${order._id}/receipt`, {
+        ...getAuthHeader(),
+        responseType: "blob",
+      });
 
-  <div class="totals-wrap">
-    <div class="totals-box">
-      <div class="t-row"><span>Subtotal:</span><span>₹${Number(order.price || 0).toLocaleString()}</span></div>
-      <div class="t-row"><span>Taxes:</span><span>₹0</span></div>
-      <div class="t-row t-grand"><span>Total Paid:</span><span>₹${Number(order.price || 0).toLocaleString()}</span></div>
-    </div>
-  </div>
-
-  <div class="footer">
-    <p><strong>Thank you for your order!</strong></p>
-    <small>Computer generated receipt · Inventory OS</small>
-  </div>
-</body>
-</html>`;
-
-    const blob = new Blob([invoiceHTML], { type: "text/html;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `Receipt_${invCode}.html`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+      // Create a Blob from the PDF Stream
+      const fileBlob = new Blob([response.data], { type: "application/pdf" });
+      const downloadUrl = window.URL.createObjectURL(fileBlob);
+      const link = document.createElement("a");
+      const invCode = `INV-${order._id?.slice(-8).toUpperCase()}`;
+      link.href = downloadUrl;
+      link.setAttribute("download", `Receipt_${invCode}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+      console.error("PDF Receipt download error:", error);
+      if (error.response?.data instanceof Blob) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const errObj = JSON.parse(reader.result);
+            alert(errObj.message || "Failed to download receipt.");
+          } catch (e) {
+            alert("Failed to download PDF receipt. Please try again.");
+          }
+        };
+        reader.readAsText(error.response.data);
+      } else {
+        alert(error.response?.data?.message || "Failed to download PDF receipt.");
+      }
+    } finally {
+      setDownloadingId(null);
+    }
   };
 
   const counts = {
@@ -404,11 +263,10 @@ const CustomerOrder = () => {
 
                       <td>
                         <span
-                          className={`payment-pill ${
-                            (order.paymentId || "").toLowerCase() === "cash"
-                              ? "cash"
-                              : "online"
-                          }`}
+                          className={`payment-pill ${(order.paymentId || "").toLowerCase() === "cash"
+                            ? "cash"
+                            : "online"
+                            }`}
                         >
                           {(order.paymentId || "CASH").toUpperCase()}
                         </span>
@@ -431,13 +289,34 @@ const CustomerOrder = () => {
                           >
                             <FaTruck /> Track
                           </button>
+
+                          {currentStatus === "Delivered" ? (
+                            <button
+                              className="action-btn download-pdf-action"
+                              onClick={() => downloadPdfReceipt(order)}
+                              disabled={downloadingId === order._id}
+                              title="Download Official PDF Receipt"
+                            >
+                              <FaDownload /> {downloadingId === order._id ? "Downloading..." : "PDF Receipt"}
+                            </button>
+                          ) : (
+                            <button
+                              className="action-btn receipt-pending-action"
+                              onClick={() => alert("Receipt download will be available once the order is Delivered.")}
+                              title="Receipt available after delivery"
+                            >
+                              <FaReceipt /> PDF (On Delivery)
+                            </button>
+                          )}
+
                           <button
                             className="action-btn invoice-action"
                             onClick={() => setInvoiceOrder(order)}
                             title="View Receipt"
                           >
-                            <FaReceipt /> Receipt
+                            <FaReceipt /> Preview
                           </button>
+
                           {isCancelable && (
                             <button
                               className="action-btn delete-action"
@@ -498,9 +377,8 @@ const CustomerOrder = () => {
                   return (
                     <div
                       key={step.key}
-                      className={`stepper-step ${
-                        isCompleted ? "completed" : ""
-                      } ${isCurrent ? "current" : ""}`}
+                      className={`stepper-step ${isCompleted ? "completed" : ""
+                        } ${isCurrent ? "current" : ""}`}
                     >
                       <div className="step-circle">
                         {step.icon}
@@ -508,9 +386,8 @@ const CustomerOrder = () => {
                       <span className="step-name">{step.label}</span>
                       {idx < TRACKING_STEPS.length - 1 && (
                         <div
-                          className={`step-connector ${
-                            idx < stepIndex ? "active" : ""
-                          }`}
+                          className={`step-connector ${idx < stepIndex ? "active" : ""
+                            }`}
                         />
                       )}
                     </div>
@@ -539,6 +416,15 @@ const CustomerOrder = () => {
             </div>
 
             <div className="modal-actions-row">
+              {trackOrder.status === "Delivered" && (
+                <button
+                  className="modal-primary-btn download-pdf-btn"
+                  onClick={() => downloadPdfReceipt(trackOrder)}
+                  disabled={downloadingId === trackOrder._id}
+                >
+                  <FaDownload /> {downloadingId === trackOrder._id ? "Downloading..." : "Download PDF Receipt"}
+                </button>
+              )}
               <button
                 className="modal-primary-btn"
                 onClick={() => {
@@ -567,13 +453,20 @@ const CustomerOrder = () => {
               </div>
 
               <div className="invoice-btn-group">
-                <button
-                  className="download-invoice-btn"
-                  onClick={() => downloadInvoice(invoiceOrder)}
-                  title="Download HTML Receipt"
-                >
-                  <FaDownload /> Download Receipt
-                </button>
+                {invoiceOrder.status === "Delivered" ? (
+                  <button
+                    className="download-invoice-btn"
+                    onClick={() => downloadPdfReceipt(invoiceOrder)}
+                    disabled={downloadingId === invoiceOrder._id}
+                    title="Download Official PDF Receipt"
+                  >
+                    <FaDownload /> {downloadingId === invoiceOrder._id ? "Downloading..." : "Download PDF Receipt"}
+                  </button>
+                ) : (
+                  <span className="receipt-locked-tag" title="Receipt will be available once the order is Delivered">
+                    🔒 PDF Available After Delivery
+                  </span>
+                )}
                 <button className="print-modal-btn" onClick={printInvoice}>
                   <FaPrint /> Print
                 </button>
@@ -590,7 +483,7 @@ const CustomerOrder = () => {
                   <span className="invoice-brand-sub">Customer Purchase Receipt</span>
                 </div>
                 <div className="invoice-meta-right">
-                  <h2 className="invoice-tag">PURCHASE RECEIPT</h2>
+                  <h2 className="invoice-tag">BILLING RECEIPT</h2>
                   <div className="meta-text"><strong>Receipt No:</strong> INV-{invoiceOrder._id?.slice(-8).toUpperCase()}</div>
                   <div className="meta-text"><strong>Date:</strong> {invoiceOrder.createdAt ? new Date(invoiceOrder.createdAt).toLocaleDateString() : new Date().toLocaleDateString()}</div>
                 </div>
@@ -611,7 +504,7 @@ const CustomerOrder = () => {
               <table className="invoice-items-table">
                 <thead>
                   <tr>
-                    <th>#</th>
+                    <th>Item No</th>
                     <th>Product Title</th>
                     <th>Rate</th>
                     <th>Qty</th>

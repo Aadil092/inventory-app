@@ -49,21 +49,33 @@
 }
 
 /* =========================================================
-   SIDEBAR
+   SIDEBAR (FIXED POSITION)
 ============================================================ */
 .customer-sidebar {
   width: 270px;
-  min-height: 100vh;
-  position: sticky;
+  height: 100vh;
+  position: fixed;
   top: 0;
+  left: 0;
+  bottom: 0;
   background-color: var(--bg-sidebar);
   border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 24px 18px;
-  z-index: 50;
+  z-index: 100;
+  overflow-y: auto;
   transition: all 0.3s ease;
+}
+
+.customer-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.customer-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 4px;
 }
 
 .sidebar-brand-box {
@@ -79,7 +91,7 @@
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #10b981 0%, #190bda 100%);
+  background: linear-gradient(135deg, #142bff 0%, #0a24de 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -242,9 +254,11 @@
 ============================================================ */
 .customer-main-wrapper {
   flex: 1;
+  margin-left: 270px;
   display: flex;
   flex-direction: column;
   min-width: 0;
+  min-height: 100vh;
   background-color: var(--bg-primary);
   transition: background-color 0.3s ease;
 }
@@ -263,11 +277,46 @@
   transition: all 0.3s ease;
 }
 
+.navbar-left-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.navbar-welcome-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navbar-welcome-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+}
+
+.welcome-username {
+  background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800;
+}
+
+.customer-dashboard-layout.dark-theme .welcome-username {
+  background: linear-gradient(135deg, #60a5fa 0%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .navbar-breadcrumb {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
+  font-size: 12.5px;
 }
 
 .breadcrumb-root {
@@ -280,7 +329,7 @@
 }
 
 .breadcrumb-active {
-  color: var(--text-main);
+  color: var(--accent-color);
   font-weight: 700;
 }
 
@@ -333,21 +382,33 @@
 }
 
 .nav-avatar {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: #10b981;
+  background: linear-gradient(135deg, #10b981, #059669);
   color: #ffffff;
   font-weight: 700;
-  font-size: 12px;
+  font-size: 13px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.nav-role-tag {
-  font-size: 12px;
+.nav-profile-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.nav-user-name {
+  font-size: 12.5px;
   font-weight: 700;
+  color: var(--text-main);
+}
+
+.nav-role-tag {
+  font-size: 11px;
+  font-weight: 600;
   color: var(--text-muted);
 }
 
@@ -364,9 +425,19 @@
 
   .customer-sidebar {
     width: 100%;
+    height: auto;
     min-height: auto;
     position: relative;
+    top: auto;
+    left: auto;
+    bottom: auto;
+    z-index: 50;
+    overflow-y: visible;
     padding: 16px;
+  }
+
+  .customer-main-wrapper {
+    margin-left: 0;
   }
 
   .sidebar-nav-list {

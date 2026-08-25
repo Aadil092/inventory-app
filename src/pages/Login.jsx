@@ -15,6 +15,9 @@ import {
   FaTruck,
   FaUser,
   FaUserShield,
+  FaBan,
+  FaPauseCircle,
+  FaExclamationTriangle,
 } from "react-icons/fa";
 import "./Login.css";
 
@@ -168,7 +171,7 @@ const Login = () => {
                 <FaBoxOpen />
               </div>
               <h2 className="form-brand-title">
-                {isRegister ? "Inventory Management System  Create Customer Account" : "Inventory Managment System"}
+                {isRegister ? "AI-Powered Inventory Management System · Create Customer Account" : "AI-Powered Inventory Management System"}
               </h2>
               <p className="form-brand-subtitle">
                 {isRegister
@@ -180,9 +183,34 @@ const Login = () => {
 
             {/* Error Message Box */}
             {error && (
-              <div className="auth-error-alert">
-                <span>⚠️</span>
-                <span>{error}</span>
+              <div
+                className={`auth-error-alert ${
+                  error.toLowerCase().includes("blocked")
+                    ? "blocked-alert"
+                    : error.toLowerCase().includes("deactivated")
+                    ? "deactive-alert"
+                    : ""
+                }`}
+              >
+                <div className="alert-badge-icon">
+                  {error.toLowerCase().includes("blocked") ? (
+                    <FaBan />
+                  ) : error.toLowerCase().includes("deactivated") ? (
+                    <FaPauseCircle />
+                  ) : (
+                    <FaExclamationTriangle />
+                  )}
+                </div>
+                <div className="alert-body">
+                  <strong>
+                    {error.toLowerCase().includes("blocked")
+                      ? "Account Blocked"
+                      : error.toLowerCase().includes("deactivated")
+                      ? "Account Deactivated"
+                      : "Authentication Error"}
+                  </strong>
+                  <p>{error}</p>
+                </div>
               </div>
             )}
 
